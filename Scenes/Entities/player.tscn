@@ -30,19 +30,32 @@ animations = [{
 radius = 12.0
 height = 42.0
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnns0"]
+height = 40.0
+
 [node name="Player" type="CharacterBody2D" unique_id=1088978412]
 scale = Vector2(0.5, 0.5)
 script = ExtResource("1_82m87")
 Speed = 300
 JumpForce = -300.0
 JumpVelocity = -350.0
-metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=850158564]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_soeho")
-animation = &"Player_Run"
+animation = &"Player_Idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=214109787]
-position = Vector2(-3, -1)
+position = Vector2(-2, 0)
 shape = SubResource("CapsuleShape2D_r6ure")
+
+[node name="HitBox" type="Area2D" parent="." unique_id=1164701523]
+position = Vector2(-2, 0)
+collision_layer = 0
+collision_mask = 12
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=1239220697]
+shape = SubResource("CapsuleShape2D_lnns0")
+debug_color = Color(1, 0, 0, 0.41960785)
+
+[connection signal="body_entered" from="HitBox" to="." method="_on_hit_box_body_entered"]

@@ -5,6 +5,18 @@ public partial class Player : CharacterBody2D
     [Signal]
     public delegate void HitEventHandler();
 
+    //Health
+    [Export] public int MaxHealth = 4;
+    private int _currentHealth;
+    private bool _isInvulnerable = false;
+    private float _invulTime = 0.6f;
+    private float _invulTimer = 0f;
+
+    //KnockBack
+    [Export] public float KnockbackForceX = 250f;
+    [Export] public float KnockbackForceY = -300f;
+
+    //Movement
     [Export] public int Speed { get; set; } = 400;
     [Export] public float JumpForce = -400f;
     [Export] public float JumpVelocity = -450f;
@@ -21,6 +33,7 @@ public partial class Player : CharacterBody2D
         ScreenSize = GetViewportRect().Size;
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
+        _currentHealth = MaxHealth;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -59,6 +72,56 @@ public partial class Player : CharacterBody2D
 
         // 4️⃣ Animation
         SetAnimation(direction);
+
+        if (_isInvulnerable)
+        {
+            _invulTimer -= (float)delta;
+
+            if (_invulTimer <= 0)
+            {
+                _isInvulnerable = false;
+            }
+        }
+
+    }
+
+    public void TakeDamage(int amount, Vector2 sourcePosition)
+    {
+        if (_isInvulnerable)
+            return;
+
+        _currentHealth -= amount;
+
+        GD.Print("Player HP: " + _currentHealth);
+
+        if (_currentHealth <= 0)
+        {
+            Die();
+            return;
+        }
+
+        ApplyKnockback(sourcePosition);
+
+        _isInvulnerable = true;
+        _invulTimer = _invulTime;
+    }
+
+    private void ApplyKnockback(Vector2 sourcePosition)
+    {
+        float direction = GlobalPosition.X < sourcePosition.X ? -1 : 1;
+
+        Velocity = new Vector2(
+            direction * KnockbackForceX,
+            KnockbackForceY
+        );
+    }
+
+    private void Die()
+    {
+        GD.Print("Player Died");
+
+        //QueueFree(); // or respawn logic later
+        GetTree().ReloadCurrentScene();
     }
 
     private void SetAnimation(float direction)
@@ -73,4 +136,24 @@ public partial class Player : CharacterBody2D
             _animatedSprite.Play("Player_Idle");
         }
     }
+
+    //For layer 3 tiles
+    private void _on_hit_box_body_entered(Node body)
+    {
+        if (body is PhysicsBody2D physicsBody)
+        {
+            // Layer 3 (spikes) = 1 << 2 = 4
+            if ((physicsBody.CollisionLayer & (1 << 2)) != 0)
+            {
+                Die();
+            }
+            // Example: Layer 4 (enemies) = 1 << 3 = 8
+            else if ((physicsBody.CollisionLayer & (1 << 3)) != 0)
+            {
+                TakeDamage(1, physicsBody.GlobalPosition);
+            }
+        }
+    }
+
+
 }

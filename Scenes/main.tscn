@@ -1,7 +1,8 @@
-[gd_scene format=3 uid="uid://bmktgbt1k7hht"]
+[gd_scene format=4 uid="uid://bmktgbt1k7hht"]
 
 [ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="1_jjgbg"]
 [ext_resource type="PackedScene" uid="uid://drdkowh8smudn" path="res://CaveExp-Godot/Scenes/Entities/snake.tscn" id="2_bo1nx"]
+[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://CaveExp-Godot/Scenes/DamageObjects/spikes.tscn" id="2_iwedk"]
 [ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://CaveExp-Godot/Scenes/Entities/player.tscn" id="3_8gbba"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
@@ -30,7 +31,16 @@ position = Vector2(1, 0)
 tile_set = SubResource("TileSet_8gbba")
 collision_visibility_mode = 1
 format = 2
-layer_0/tile_data = PackedInt32Array(196604, 11, 0, 196605, 11, 0, 196606, 11, 0, 196607, 11, 0, 131072, 11, 0, 131073, 11, 0, 131074, 11, 0, 131075, 11, 0, 131076, 11, 0, 196603, 11, 0, 131077, 11, 0, 196602, 11, 0, 196601, 11, 0, 131078, 11, 0, 131079, 11, 0)
+
+[node name="Spikes" parent="TileMap" unique_id=1045495095 instance=ExtResource("2_iwedk")]
+tile_map_data = PackedByteArray("AAD+/wEAAAAAAAAAAAA=")
+
+[node name="Dirt" type="TileMapLayer" parent="TileMap" unique_id=825281796]
+texture_filter = 1
+use_parent_material = true
+tile_map_data = PackedByteArray("AAD7/wIACwAAAAAAAAD8/wIACwAAAAAAAAD9/wIACwAAAAAAAAD+/wIACwAAAAAAAAD//wIACwAAAAAAAAAAAAIACwAAAAAAAAABAAIACwAAAAAAAAACAAIACwAAAAAAAAADAAIACwAAAAAAAAAEAAIACwAAAAAAAAD6/wIACwAAAAAAAAD5/wIACwAAAAAAAAAFAAIACwAAAAAAAAA=")
+tile_set = SubResource("TileSet_8gbba")
+collision_visibility_mode = 1
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=172818945]
 zoom = Vector2(4, 4)
