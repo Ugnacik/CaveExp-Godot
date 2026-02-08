@@ -39,6 +39,7 @@ script = ExtResource("1_82m87")
 Speed = 300
 JumpForce = -300.0
 JumpVelocity = -350.0
+metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=850158564]
 texture_filter = 1

@@ -140,19 +140,12 @@ public partial class Player : CharacterBody2D
     //For layer 3 tiles
     private void _on_hit_box_body_entered(Node body)
     {
-        if (body is PhysicsBody2D physicsBody)
-        {
-            // Layer 3 (spikes) = 1 << 2 = 4
-            if ((physicsBody.CollisionLayer & (1 << 2)) != 0)
-            {
-                Die();
-            }
-            // Example: Layer 4 (enemies) = 1 << 3 = 8
-            else if ((physicsBody.CollisionLayer & (1 << 3)) != 0)
-            {
-                TakeDamage(1, physicsBody.GlobalPosition);
-            }
+
+        if (body is TileMapLayer) 
+        { 
+            Die(); 
         }
+
     }
 
 
