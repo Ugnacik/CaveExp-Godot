@@ -67,16 +67,20 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1sunx"]
-radius = 3.0
+radius = 4.0
 height = 10.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fmxil"]
 radius = 2.5
-height = 13.0
+height = 15.0
 
+<<<<<<< Updated upstream
 [node name="Snake" type="CharacterBody2D" unique_id=1176825351]
+=======
+[node name="Snake" type="CharacterBody2D" unique_id=827157802]
+collision_layer = 8
+>>>>>>> Stashed changes
 script = ExtResource("1_ymru8")
-metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=737076210]
 texture_filter = 1
@@ -84,14 +88,35 @@ sprite_frames = SubResource("SpriteFrames_sf0t3")
 animation = &"Walk"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2008666270]
+visible = false
 position = Vector2(-2, -1)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_1sunx")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="." unique_id=1275996677]
+visible = false
 position = Vector2(0.5, 5.5)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_fmxil")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=630232230]
 rect = Rect2(-7, -4, 14, 12)
+<<<<<<< Updated upstream
+=======
+
+[node name="HitBox" type="Area2D" parent="." unique_id=1188437225]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=641679118]
+position = Vector2(-3, 0)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_1sunx")
+debug_color = Color(0.5660922, 1.7688051e-06, 3.3691526e-07, 0.41960785)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="HitBox" unique_id=1779631200]
+position = Vector2(0.5, 5.5)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_fmxil")
+debug_color = Color(0.59905666, 1.4318898e-06, 4.3317675e-07, 0.41960785)
+
+[connection signal="body_entered" from="HitBox" to="." method="_on_hit_box_body_entered"]
+>>>>>>> Stashed changes
