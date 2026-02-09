@@ -5,6 +5,11 @@ public partial class Snake : Enemy
     [Export] public float PatrolSpeed = 50f;
     [Export] public float LedgeCheckDistance = 8f;
 
+    //Shape to be flipped
+    private CollisionShape2D _frontShape;
+    private float _frontShapeBaseX;
+
+
     private int _direction = 1;
     private AnimatedSprite2D _animatedSprite;
 
@@ -12,6 +17,8 @@ public partial class Snake : Enemy
     {
         base._Ready();
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+        _frontShape = GetNode<CollisionShape2D>("HitBox/CollisionShape2D");
+        _frontShapeBaseX = _frontShape.Position.X;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -42,26 +49,26 @@ public partial class Snake : Enemy
     }
     private void UpdateAnimation()
     {
-        if (!IsOnFloor())
+        if (_isAttacking)
         {
-            _animatedSprite.Play("Idle");
-            return;
-        }
-
-        if (Mathf.Abs(Velocity.X) > 1f)
-        {
-            _animatedSprite.Play("Move");
+            if (_animatedSprite.Animation != "Attack")
+                _animatedSprite.Play("Attack");
         }
         else
         {
-            _animatedSprite.Play("Idle");
+            _animatedSprite.Play("Walk");
         }
     }
 
     private void TurnAround()
     {
         _direction *= -1;
-        _animatedSprite.FlipH = _direction < 0;
+
+        // Flip sprite
+        _animatedSprite.FlipH = _direction > 0;
+
+        _frontShape.Position = new Vector2(_frontShapeBaseX * _direction,_frontShape.Position.Y);
+
     }
 
     private bool IsAtLedge()

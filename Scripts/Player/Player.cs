@@ -1,4 +1,5 @@
 using Godot;
+using static Godot.TextServer;
 
 public partial class Player : CharacterBody2D
 {
@@ -24,6 +25,9 @@ public partial class Player : CharacterBody2D
     [Export] public float LowJumpMultiplier = 2.5f;
     private float _gravity;
 
+    //Shape to be flipped
+    private CollisionShape2D _HitBox;
+    private float _HitBoxBaseX;
 
     private AnimatedSprite2D _animatedSprite;
     public Vector2 ScreenSize;
@@ -34,6 +38,9 @@ public partial class Player : CharacterBody2D
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
         _currentHealth = MaxHealth;
+
+        _HitBox = GetNode<CollisionShape2D>("HitBox/CollisionShape2D");
+        _HitBoxBaseX = _HitBox.Position.X;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -126,10 +133,15 @@ public partial class Player : CharacterBody2D
 
     private void SetAnimation(float direction)
     {
+        _HitBox.Position = new Vector2(_HitBoxBaseX * direction, _HitBox.Position.Y);
+        
+
         if (direction != 0)
         {
             _animatedSprite.Play("Player_Run");
             _animatedSprite.FlipH = direction < 0;
+            //GD.Print("Facing: ", direction, " Hitbox X: ", _HitBox.Position.X);   //DEBUG
+
         }
         else
         {

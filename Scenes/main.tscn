@@ -33,7 +33,7 @@ collision_visibility_mode = 1
 format = 2
 
 [node name="Spikes" parent="TileMap" unique_id=1045495095 instance=ExtResource("2_iwedk")]
-tile_map_data = PackedByteArray("AAD+/wEAAAAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAD5/wEAAAAAAAAAAAA=")
 
 [node name="Dirt" type="TileMapLayer" parent="TileMap" unique_id=825281796]
 texture_filter = 1
@@ -48,7 +48,6 @@ limit_enabled = false
 
 [node name="Snake" parent="." unique_id=1204722244 instance=ExtResource("2_bo1nx")]
 position = Vector2(33, 11)
-gravity_scale = 1.0
 
 [node name="Player" parent="." unique_id=1088978412 instance=ExtResource("3_8gbba")]
 position = Vector2(-66, -3)
