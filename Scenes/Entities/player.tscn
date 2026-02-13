@@ -27,7 +27,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lnns0"]
-size = Vector2(28, 40)
+size = Vector2(28, 42)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnns0"]
 height = 40.0
@@ -45,6 +45,7 @@ sprite_frames = SubResource("SpriteFrames_soeho")
 animation = &"Player_Run"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=214109787]
+position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_lnns0")
 
 [node name="HitBox" type="Area2D" parent="." unique_id=1164701523]

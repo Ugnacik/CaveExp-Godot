@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://bgkahg6w7pl7j"]
+
+[ext_resource type="Texture2D" uid="uid://b2qhaigdpnmjn" path="res://CaveExp-Godot/Sprites/Enemies/Bat/Fly.png" id="1_lv4th"]
+[ext_resource type="Texture2D" uid="uid://bwg1y01aubrc0" path="res://CaveExp-Godot/Sprites/Enemies/Bat/Hang.png" id="2_17x5k"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_at6g3"]
+atlas = ExtResource("1_lv4th")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gq56m"]
+atlas = ExtResource("1_lv4th")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6b5tm"]
+atlas = ExtResource("1_lv4th")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wk8cg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_at6g3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gq56m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6b5tm")
+}],
+"loop": true,
+"name": &"Fly",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_17x5k")
+}],
+"loop": true,
+"name": &"Hang",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aa24h"]
+size = Vector2(16, 13)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f5oxm"]
+size = Vector2(9, 16)
+
+[node name="Bat" type="CharacterBody2D" unique_id=357385223]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=869274820]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_wk8cg")
+animation = &"Fly"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1849411997]
+visible = false
+position = Vector2(-1.5000004, -2.3841858e-07)
+rotation = 1.5707964
+shape = SubResource("RectangleShape2D_aa24h")
+
+[node name="HitBox" type="Area2D" parent="." unique_id=1700873576]
+collision_layer = 9
+collision_mask = 9
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=922395902]
+visible = false
+position = Vector2(-2.185571e-08, 0.5000001)
+rotation = 1.5707964
+shape = SubResource("RectangleShape2D_f5oxm")
+debug_color = Color(0.80813736, 3.3210217e-06, 4.813075e-07, 0.41960785)
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=10713429]
+collision_layer = 9
+collision_mask = 9
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=345503067]
+position = Vector2(-2.185571e-08, 0.5000001)
+rotation = 1.5707964
+shape = SubResource("RectangleShape2D_f5oxm")
+debug_color = Color(0.80813736, 3.3210217e-06, 4.813075e-07, 0.41960785)

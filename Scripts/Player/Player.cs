@@ -17,6 +17,12 @@ public partial class Player : CharacterBody2D
     [Export] public float KnockbackForceX = 250f;
     [Export] public float KnockbackForceY = -300f;
 
+    //Stomp
+    [Export] public int StompDamage = 1;
+    [Export] public float StompBounceForce = -350f;
+    [Export] public float StompTolerance = 6f;
+
+
     //Movement
     [Export] public int Speed { get; set; } = 400;
     [Export] public float JumpForce = -400f;
@@ -76,6 +82,7 @@ public partial class Player : CharacterBody2D
 
         Velocity = velocity;
         MoveAndSlide();
+        HandleEnemyCollision();
 
         // 4️⃣ Animation
         SetAnimation(direction);
@@ -113,6 +120,47 @@ public partial class Player : CharacterBody2D
         _invulTimer = _invulTime;
     }
 
+    private void HandleEnemyCollision()
+    {
+        for (int i = 0; i < GetSlideCollisionCount(); i++)
+        {
+            var collision = GetSlideCollision(i);
+
+            if (collision.GetCollider() is Enemy enemy)
+            {
+                if (TryStompEnemy(enemy, collision))
+                    return;
+
+                // Otherwise player takes damage
+                enemy.DealDamage(this);
+                return;
+            }
+        }
+    }
+    private bool TryStompEnemy(Enemy enemy, KinematicCollision2D collision)
+    {
+        // If collision normal is pointing upward,
+        // it means we hit the enemy from above.
+        if (collision.GetNormal().Y < -0.7f)
+        {
+            enemy.TakeDamage(StompDamage);
+            BounceAfterStomp();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void BounceAfterStomp()
+    {
+        Velocity = new Vector2(Velocity.X, StompBounceForce);
+    }
+    public float GetCollisionHeight()
+    {
+        var shape = GetNode<CollisionShape2D>("CollisionShape2D").Shape as RectangleShape2D;
+        return shape.Size.Y;
+    }
+
     private void ApplyKnockback(Vector2 sourcePosition)
     {
         float direction = GlobalPosition.X < sourcePosition.X ? -1 : 1;
@@ -128,20 +176,19 @@ public partial class Player : CharacterBody2D
         GD.Print("Player Died");
 
         //QueueFree(); // or respawn logic later
-        GetTree().ReloadCurrentScene();
+        CallDeferred(nameof(ReloadScene));
     }
 
     private void SetAnimation(float direction)
     {
         _HitBox.Position = new Vector2(_HitBoxBaseX * direction, _HitBox.Position.Y);
-        
+
 
         if (direction != 0)
         {
             _animatedSprite.Play("Player_Run");
             _animatedSprite.FlipH = direction < 0;
             //GD.Print("Facing: ", direction, " Hitbox X: ", _HitBox.Position.X);   //DEBUG
-
         }
         else
         {
@@ -153,12 +200,15 @@ public partial class Player : CharacterBody2D
     private void _on_hit_box_body_entered(Node body)
     {
 
-        if (body is TileMapLayer) 
-        { 
-            Die(); 
+        if (body is TileMapLayer)
+        {
+            Die();
         }
-
     }
 
+    private void ReloadScene()
+    {
+        GetTree().ReloadCurrentScene();
+    }
 
 }

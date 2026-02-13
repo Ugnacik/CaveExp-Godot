@@ -3,14 +3,11 @@ using Godot;
 public partial class Snake : Enemy
 {
     [Export] public float PatrolSpeed = 50f;
-    [Export] public float LedgeCheckDistance = 8f;
 
     //Shape to be flipped
     private CollisionShape2D _frontShape;
     private float _frontShapeBaseX;
 
-
-    private int _direction = 1;
     private AnimatedSprite2D _animatedSprite;
 
     public override void _Ready()
@@ -34,6 +31,8 @@ public partial class Snake : Enemy
 
         MoveAndSlide();
         UpdateAnimation();
+        HandlePlayerCollision();
+
 
         // Turn around if wall
         if (IsOnWall())
@@ -47,6 +46,20 @@ public partial class Snake : Enemy
             TurnAround();
         }
     }
+    private void HandlePlayerCollision()
+    {
+        for (int i = 0; i < GetSlideCollisionCount(); i++)
+        {
+            var collision = GetSlideCollision(i);
+
+            if (collision.GetCollider() is Player player)
+            {
+                player.TakeDamage(Damage, GlobalPosition);
+                return;
+            }
+        }
+    }
+
     private void UpdateAnimation()
     {
         if (_isAttacking)
@@ -60,33 +73,7 @@ public partial class Snake : Enemy
         }
     }
 
-    private void TurnAround()
-    {
-        _direction *= -1;
-
-        // Flip sprite
-        _animatedSprite.FlipH = _direction > 0;
-
-        _frontShape.Position = new Vector2(_frontShapeBaseX * _direction,_frontShape.Position.Y);
-
-    }
-
-    private bool IsAtLedge()
-    {
-        Vector2 forward = new Vector2(_direction * LedgeCheckDistance, 0);
-        Vector2 rayStart = GlobalPosition + forward;
-
-        var space = GetWorld2D().DirectSpaceState;
-
-        var query = PhysicsRayQueryParameters2D.Create(
-            rayStart,
-            rayStart + Vector2.Down * 16f
-        );
-
-        var result = space.IntersectRay(query);
-
-        return result.Count == 0;
-    }
+    
 }
 
 
