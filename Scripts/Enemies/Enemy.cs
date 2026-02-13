@@ -5,6 +5,7 @@ public partial class Enemy : CharacterBody2D
     [Export] public int MaxHealth = 1;
     [Export] public int Damage = 1;
     [Export] public float LedgeCheckDistance = 8f;
+    private AnimatedSprite2D _animatedSprite;
     protected bool _isAttacking = false;
     protected int _currentHealth;
     protected int _direction = 1;
@@ -12,6 +13,7 @@ public partial class Enemy : CharacterBody2D
     public override void _Ready()
     {
         _currentHealth = MaxHealth;
+        _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
     }
 
     // =========================
@@ -81,9 +83,12 @@ public partial class Enemy : CharacterBody2D
 
     protected virtual void UpdateFacing()
     {
-        var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-        if (sprite != null)
-            sprite.FlipH = _direction < 0;
+        //var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+        if (_animatedSprite != null)
+        {
+            GD.Print($"{Name} flipped.");
+            _animatedSprite.FlipH = _direction > 0;
+        }
     }
 }
 

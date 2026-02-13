@@ -69,14 +69,6 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4qsly"]
 size = Vector2(12, 16)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1sunx"]
-radius = 3.0
-height = 10.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fmxil"]
-radius = 2.0
-height = 16.0
-
 [node name="Snake" type="CharacterBody2D" unique_id=1176825351]
 collision_layer = 9
 collision_mask = 9
@@ -92,17 +84,3 @@ flip_h = true
 position = Vector2(-2.3841858e-07, 1.9999998)
 rotation = 1.5707964
 shape = SubResource("RectangleShape2D_4qsly")
-
-[node name="HitBox" type="Area2D" parent="." unique_id=748853294]
-collision_layer = 9
-collision_mask = 9
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=2008666270]
-position = Vector2(3, -1)
-rotation = 1.5707964
-shape = SubResource("CapsuleShape2D_1sunx")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="HitBox" unique_id=1275996677]
-position = Vector2(0, 6)
-rotation = 1.5707964
-shape = SubResource("CapsuleShape2D_fmxil")

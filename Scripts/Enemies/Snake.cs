@@ -5,8 +5,6 @@ public partial class Snake : Enemy
     [Export] public float PatrolSpeed = 50f;
 
     //Shape to be flipped
-    private CollisionShape2D _frontShape;
-    private float _frontShapeBaseX;
 
     private AnimatedSprite2D _animatedSprite;
 
@@ -14,8 +12,6 @@ public partial class Snake : Enemy
     {
         base._Ready();
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-        _frontShape = GetNode<CollisionShape2D>("HitBox/CollisionShape2D");
-        _frontShapeBaseX = _frontShape.Position.X;
     }
 
     public override void _PhysicsProcess(double delta)
