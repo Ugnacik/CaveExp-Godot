@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bgkahg6w7pl7j"]
 
 [ext_resource type="Texture2D" uid="uid://b2qhaigdpnmjn" path="res://CaveExp-Godot/Sprites/Enemies/Bat/Fly.png" id="1_n2xlw"]
+[ext_resource type="Script" uid="uid://ds7jj8s4lfcib" path="res://CaveExp-Godot/Scripts/Enemies/Bat.cs" id="1_sgcmh"]
 [ext_resource type="Texture2D" uid="uid://bwg1y01aubrc0" path="res://CaveExp-Godot/Sprites/Enemies/Bat/Hang.png" id="2_sgcmh"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gq56m"]
@@ -44,15 +45,19 @@ animations = [{
 size = Vector2(11, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f5oxm"]
-size = Vector2(9, 16)
+size = Vector2(128, 248)
 
 [node name="Bat" type="CharacterBody2D" unique_id=357385223]
+script = ExtResource("1_sgcmh")
+FlySpeed = 100.0
+Acceleration = 250.0
+metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=869274820]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_wk8cg")
-animation = &"Fly"
-frame_progress = 0.07968762
+animation = &"Hang"
+flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1849411997]
 position = Vector2(-4.0133926e-07, 0.49999976)
@@ -60,11 +65,13 @@ rotation = 1.5707964
 shape = SubResource("RectangleShape2D_aa24h")
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=10713429]
-collision_layer = 9
-collision_mask = 9
+collision_layer = 0
+collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=345503067]
-position = Vector2(-2.185571e-08, 0.5000001)
+position = Vector2(-3.174979e-06, 60)
 rotation = 1.5707964
 shape = SubResource("RectangleShape2D_f5oxm")
 debug_color = Color(0.80813736, 3.3210217e-06, 4.813075e-07, 0.41960785)
+
+[connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]

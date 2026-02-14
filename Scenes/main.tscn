@@ -1,9 +1,9 @@
 [gd_scene format=4 uid="uid://bmktgbt1k7hht"]
 
 [ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="1_jjgbg"]
-[ext_resource type="PackedScene" uid="uid://drdkowh8smudn" path="res://CaveExp-Godot/Scenes/Entities/snake.tscn" id="2_bo1nx"]
 [ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://CaveExp-Godot/Scenes/DamageObjects/spikes.tscn" id="2_iwedk"]
 [ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://CaveExp-Godot/Scenes/Entities/player.tscn" id="3_8gbba"]
+[ext_resource type="PackedScene" uid="uid://bgkahg6w7pl7j" path="res://CaveExp-Godot/Scenes/Entities/bat.tscn" id="5_153kn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
 texture = ExtResource("1_jjgbg")
@@ -33,21 +33,17 @@ collision_visibility_mode = 1
 format = 2
 
 [node name="Spikes" parent="TileMap" unique_id=1045495095 instance=ExtResource("2_iwedk")]
-tile_map_data = PackedByteArray("AAD5/wEAAAAAAAAAAAA=")
+tile_map_data = PackedByteArray("AADu/wEAAAAAAAAAAAA=")
 
 [node name="Dirt" type="TileMapLayer" parent="TileMap" unique_id=825281796]
 texture_filter = 1
 use_parent_material = true
-tile_map_data = PackedByteArray("AAD7/wIACwAAAAAAAAD8/wIACwAAAAAAAAD+/wIACwAAAAAAAAAAAAIACwAAAAAAAAABAAIACwAAAAAAAAACAAIACwAAAAAAAAADAAIACwAAAAAAAAAEAAIACwAAAAAAAAD6/wIACwAAAAAAAAD5/wIACwAAAAAAAAAFAAIACwAAAAAAAAAGAAIACwAAAAAAAAD//wIACwAAAAAAAAD//wAACwAAAAAAAAACAP7/CwAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAD7/wIACwAAAAAAAAD8/wIACwAAAAAAAAD+/wIACwAAAAAAAAAAAAIACwAAAAAAAAABAAIACwAAAAAAAAACAAIACwAAAAAAAAADAAIACwAAAAAAAAAEAAIACwAAAAAAAAD6/wIACwAAAAAAAAD5/wIACwAAAAAAAAAFAAIACwAAAAAAAAAGAAIACwAAAAAAAAD//wIACwAAAAAAAAD9/wIACwAAAAAAAAD4/wIACwAAAAAAAAAHAAIACwAAAAAAAAD3/wIACwAAAAAAAAD2/wIACwAAAAAAAAD1/wIACwAAAAAAAAD0/wIACwAAAAAAAADz/wIACwAAAAAAAADy/wIACwAAAAAAAADx/wIACwAAAAAAAADw/wIACwAAAAAAAADv/wIACwAAAAAAAADu/wIACwAAAAAAAADt/wIACwAAAAAAAAA=")
 tile_set = SubResource("TileSet_8gbba")
 collision_visibility_mode = 1
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=172818945]
-zoom = Vector2(4, 4)
-limit_enabled = false
-
-[node name="Snake" parent="." unique_id=1204722244 instance=ExtResource("2_bo1nx")]
-position = Vector2(33, 11)
-
 [node name="Player" parent="." unique_id=1088978412 instance=ExtResource("3_8gbba")]
 position = Vector2(-66, -3)
+
+[node name="Bat" parent="." unique_id=357385223 instance=ExtResource("5_153kn")]
+position = Vector2(84, -90)

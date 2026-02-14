@@ -6,12 +6,9 @@ public partial class Snake : Enemy
 
     //Shape to be flipped
 
-    private AnimatedSprite2D _animatedSprite;
-
     public override void _Ready()
     {
         base._Ready();
-        _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
     }
 
     public override void _PhysicsProcess(double delta)
