@@ -25,25 +25,20 @@ tile_proxies/coords_level = [[1, Vector2i(0, 0)], [11, Vector2i(0, 0)], [7, Vect
 
 [node name="Main" type="Node" unique_id=1370022438]
 
-[node name="TileMap" type="TileMap" parent="." unique_id=53379190]
-texture_filter = 1
-position = Vector2(1, 0)
-tile_set = SubResource("TileSet_8gbba")
-collision_visibility_mode = 1
-format = 2
-
-[node name="Spikes" parent="TileMap" unique_id=1045495095 instance=ExtResource("2_iwedk")]
-tile_map_data = PackedByteArray("AADu/wEAAAAAAAAAAAA=")
-
-[node name="Dirt" type="TileMapLayer" parent="TileMap" unique_id=825281796]
-texture_filter = 1
-use_parent_material = true
-tile_map_data = PackedByteArray("AAD7/wIACwAAAAAAAAD8/wIACwAAAAAAAAD+/wIACwAAAAAAAAAAAAIACwAAAAAAAAABAAIACwAAAAAAAAACAAIACwAAAAAAAAADAAIACwAAAAAAAAAEAAIACwAAAAAAAAD6/wIACwAAAAAAAAD5/wIACwAAAAAAAAAFAAIACwAAAAAAAAAGAAIACwAAAAAAAAD//wIACwAAAAAAAAD9/wIACwAAAAAAAAD4/wIACwAAAAAAAAAHAAIACwAAAAAAAAD3/wIACwAAAAAAAAD2/wIACwAAAAAAAAD1/wIACwAAAAAAAAD0/wIACwAAAAAAAADz/wIACwAAAAAAAADy/wIACwAAAAAAAADx/wIACwAAAAAAAADw/wIACwAAAAAAAADv/wIACwAAAAAAAADu/wIACwAAAAAAAADt/wIACwAAAAAAAAA=")
-tile_set = SubResource("TileSet_8gbba")
-collision_visibility_mode = 1
-
 [node name="Player" parent="." unique_id=1088978412 instance=ExtResource("3_8gbba")]
 position = Vector2(-66, -3)
 
 [node name="Bat" parent="." unique_id=357385223 instance=ExtResource("5_153kn")]
 position = Vector2(84, -90)
+
+[node name="Dirt" type="TileMapLayer" parent="." unique_id=825281796]
+texture_filter = 1
+use_parent_material = true
+position = Vector2(1, 0)
+tile_map_data = PackedByteArray("AAAMAAIACwAAAAAAAAALAAIACwAAAAAAAAAKAAIACwAAAAAAAAAJAAIACwAAAAAAAAAIAAIACwAAAAAAAAAHAAIACwAAAAAAAAAGAAIACwAAAAAAAAAFAAIACwAAAAAAAAAEAAIACwAAAAAAAAADAAIACwAAAAAAAAACAAIACwAAAAAAAAABAAIACwAAAAAAAAAAAAIACwAAAAAAAAD//wIACwAAAAAAAAD+/wIACwAAAAAAAAD9/wIACwAAAAAAAAD8/wIACwAAAAAAAAD7/wIACwAAAAAAAAD6/wIACwAAAAAAAAD5/wIACwAAAAAAAAD4/wIACwAAAAAAAAD3/wIACwAAAAAAAAD2/wIACwAAAAAAAAD1/wIACwAAAAAAAAD0/wIACwAAAAAAAADz/wIACwAAAAAAAADy/wIACwAAAAAAAADx/wIACwAAAAAAAADw/wIACwAAAAAAAADv/wIACwAAAAAAAADu/wIACwAAAAAAAADt/wIACwAAAAAAAADs/wIACwAAAAAAAAA=")
+tile_set = SubResource("TileSet_8gbba")
+collision_visibility_mode = 1
+
+[node name="Spikes" parent="." unique_id=1045495095 instance=ExtResource("2_iwedk")]
+position = Vector2(1, 0)
+tile_map_data = PackedByteArray("AADu/wEAAAAAAAAAAAA=")

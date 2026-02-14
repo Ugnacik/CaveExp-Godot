@@ -42,6 +42,7 @@ JumpVelocity = -350.0
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=45796508]
 zoom = Vector2(4, 4)
+position_smoothing_speed = 1.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=850158564]
 texture_filter = 1
