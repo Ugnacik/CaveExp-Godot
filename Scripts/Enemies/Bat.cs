@@ -4,7 +4,7 @@ public partial class Bat : Enemy
 {
     [Export] public float FlySpeed = 120f;
     [Export] public float Acceleration = 500f;
-
+    private Area2D _detectionArea;
     private Player _target;
 
     private bool _isActivated = false;
@@ -12,10 +12,12 @@ public partial class Bat : Enemy
     public override void _Ready()
     {
         base._Ready();
+        _detectionArea = GetNode<Area2D>("DetectionArea");
     }
 
     public override void _PhysicsProcess(double delta)
     {
+        base._PhysicsProcess(delta);
         float dt = (float)delta;
 
         if (_isActivated && _target != null)
@@ -26,7 +28,7 @@ public partial class Bat : Enemy
         {
             _animatedSprite.Play("Hang");
         }
-        MoveAndSlide();
+        
     }
 
     private void _on_detection_area_body_entered(Node body)
@@ -37,6 +39,11 @@ public partial class Bat : Enemy
             _target = player;
             _isActivated = true;
             _animatedSprite.Play("Fly");
+
+            // Disable detection area
+            _detectionArea.SetDeferred("monitoring", false);
+            _detectionArea.SetDeferred("monitorable", false);
+
         }
     }
 

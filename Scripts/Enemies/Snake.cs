@@ -13,6 +13,8 @@ public partial class Snake : Enemy
 
     public override void _PhysicsProcess(double delta)
     {
+        base._PhysicsProcess(delta);
+
         float dt = (float)delta;
 
         // Apply gravity
@@ -21,10 +23,7 @@ public partial class Snake : Enemy
 
         // Horizontal movement
         Velocity = new Vector2(_direction * PatrolSpeed, Velocity.Y);
-
-        MoveAndSlide();
         UpdateAnimation();
-        HandlePlayerCollision();
 
 
         // Turn around if wall
@@ -39,19 +38,7 @@ public partial class Snake : Enemy
             TurnAround();
         }
     }
-    private void HandlePlayerCollision()
-    {
-        for (int i = 0; i < GetSlideCollisionCount(); i++)
-        {
-            var collision = GetSlideCollision(i);
 
-            if (collision.GetCollider() is Player player)
-            {
-                player.TakeDamage(Damage, GlobalPosition);
-                return;
-            }
-        }
-    }
 
     private void UpdateAnimation()
     {

@@ -2,6 +2,9 @@ using Godot;
 
 public partial class Enemy : CharacterBody2D
 {
+    [Signal]
+    public delegate void PlayerContactEventHandler(Player player, Vector2 sourcePosition);
+
     [Export] public int MaxHealth = 1;
     [Export] public int Damage = 1;
     [Export] public float LedgeCheckDistance = 8f;
@@ -14,6 +17,11 @@ public partial class Enemy : CharacterBody2D
     {
         _currentHealth = MaxHealth;
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+    }
+    public override void _PhysicsProcess(double delta)
+    {
+        MoveAndSlide();
+        HandlePlayerCollision();
     }
 
     // =========================
@@ -45,6 +53,19 @@ public partial class Enemy : CharacterBody2D
     // =========================
     // PLAYER CONTACT DAMAGE
     // =========================
+    protected void HandlePlayerCollision()
+    {
+        for (int i = 0; i < GetSlideCollisionCount(); i++)
+        {
+            var collision = GetSlideCollision(i);
+
+            if (collision.GetCollider() is Player player)
+            {
+                player.TakeDamage(Damage, GlobalPosition);
+                return;
+            }
+        }
+    }
     public virtual void DealDamage(Player player)
     {
         player.TakeDamage(Damage, GlobalPosition);
