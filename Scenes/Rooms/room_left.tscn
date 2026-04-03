@@ -1,0 +1,46 @@
+[gd_scene format=4 uid="uid://bsgdrd3mjsy5f"]
+
+[ext_resource type="Script" uid="uid://me7vohbsvki7" path="res://CaveExp-Godot/Scripts/LevelGeneration/Room.cs" id="1_m5abw"]
+[ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="2_3q001"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0f3n6"]
+texture = ExtResource("2_3q001")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSet" id="TileSet_rx64x"]
+physics_layer_0/collision_layer = 1
+sources/11 = SubResource("TileSetAtlasSource_0f3n6")
+tile_proxies/coords_level = [[1, Vector2i(0, 0)], [11, Vector2i(0, 0)], [7, Vector2i(0, 0)], [11, Vector2i(1, 0)], [8, Vector2i(0, 0)], [11, Vector2i(2, 0)], [9, Vector2i(0, 0)], [11, Vector2i(3, 0)], [10, Vector2i(0, 0)], [11, Vector2i(4, 0)]]
+
+[node name="RoomLeft" type="Node2D" unique_id=1077537224]
+script = ExtResource("1_m5abw")
+OpeningLeft = true
+metadata/_edit_group_ = true
+
+[node name="Dirt" type="TileMapLayer" parent="." unique_id=150389059]
+texture_filter = 1
+use_parent_material = true
+tile_map_data = PackedByteArray("AAAAAP//CwAAAAAAAAABAP//CwAAAAAAAAACAP//CwAAAAAAAAADAP//CwAAAAAAAAAEAP//CwAAAAAAAAAFAP//CwAAAAAAAAAGAP//CwAAAAAAAAAHAP//CwAAAAAAAAAIAP//CwAAAAAAAAAJAP//CwAAAAAAAAAKAP//CwAAAAAAAAALAP//CwAAAAAAAAALAP7/CwAAAAAAAAALAP3/CwAAAAAAAAALAPn/CwAAAAAAAAALAPj/CwAAAAAAAAALAPf/CwAAAAAAAAAKAPf/CwAAAAAAAAAJAPf/CwAAAAAAAAAIAPf/CwAAAAAAAAAHAPf/CwAAAAAAAAAGAPf/CwAAAAAAAAAFAPf/CwAAAAAAAAAEAPf/CwAAAAAAAAADAPf/CwAAAAAAAAACAPf/CwAAAAAAAAABAPf/CwAAAAAAAAAAAPf/CwAAAAAAAAAAAPj/CwAAAAAAAAAAAPn/CwAAAAAAAAAAAP3/CwAAAAAAAAAAAP7/CwAAAAAAAAALAPz/CwAAAAAAAAALAPv/CwAAAAAAAAALAPr/CwAAAAAAAAA=")
+tile_set = SubResource("TileSet_rx64x")
+collision_visibility_mode = 1
+
+[node name="EntryTop" type="Marker2D" parent="." unique_id=892720380]
+position = Vector2(97, -144)
+
+[node name="EntyBottom" type="Marker2D" parent="." unique_id=1643298272]
+position = Vector2(96, 0)
+
+[node name="EntryLeft" type="Marker2D" parent="." unique_id=1692697266]
+position = Vector2(0, -72)
+
+[node name="EntryRight" type="Marker2D" parent="." unique_id=1061881126]
+position = Vector2(192, -72)

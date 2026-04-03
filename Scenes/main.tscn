@@ -1,44 +1,21 @@
-[gd_scene format=4 uid="uid://bmktgbt1k7hht"]
+[gd_scene format=3 uid="uid://bmktgbt1k7hht"]
 
-[ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="1_jjgbg"]
-[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://CaveExp-Godot/Scenes/DamageObjects/spikes.tscn" id="2_iwedk"]
+[ext_resource type="Script" uid="uid://cyphqkos4bqmh" path="res://CaveExp-Godot/Scripts/LevelGeneration/LevelGenerator.cs" id="2_mlvgt"]
+[ext_resource type="PackedScene" uid="uid://djkxntegrktgg" path="res://CaveExp-Godot/Scenes/Rooms/room.tscn" id="3_2b1ek"]
 [ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://CaveExp-Godot/Scenes/Entities/player.tscn" id="3_8gbba"]
-[ext_resource type="PackedScene" uid="uid://bgkahg6w7pl7j" path="res://CaveExp-Godot/Scenes/Entities/bat.tscn" id="5_153kn"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
-texture = ExtResource("1_jjgbg")
-0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-1:0/0 = 0
-1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-2:0/0 = 0
-2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-3:0/0 = 0
-3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-4:0/0 = 0
-4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-
-[sub_resource type="TileSet" id="TileSet_8gbba"]
-physics_layer_0/collision_layer = 1
-sources/11 = SubResource("TileSetAtlasSource_bo1nx")
-tile_proxies/coords_level = [[1, Vector2i(0, 0)], [11, Vector2i(0, 0)], [7, Vector2i(0, 0)], [11, Vector2i(1, 0)], [8, Vector2i(0, 0)], [11, Vector2i(2, 0)], [9, Vector2i(0, 0)], [11, Vector2i(3, 0)], [10, Vector2i(0, 0)], [11, Vector2i(4, 0)]]
+[ext_resource type="PackedScene" uid="uid://c735uxofcx7ag" path="res://CaveExp-Godot/Scenes/Rooms/room_bottom.tscn" id="4_kmkin"]
+[ext_resource type="PackedScene" uid="uid://yj11i72njgw3" path="res://CaveExp-Godot/Scenes/Rooms/room_cross.tscn" id="5_btrym"]
+[ext_resource type="PackedScene" uid="uid://dsc7kcblbn5rj" path="res://CaveExp-Godot/Scenes/Rooms/room_horizontal.tscn" id="6_d2s1b"]
+[ext_resource type="PackedScene" uid="uid://bsgdrd3mjsy5f" path="res://CaveExp-Godot/Scenes/Rooms/room_left.tscn" id="7_iti1e"]
+[ext_resource type="PackedScene" uid="uid://c47pr8q43yu5o" path="res://CaveExp-Godot/Scenes/Rooms/room_right.tscn" id="8_a67ly"]
+[ext_resource type="PackedScene" uid="uid://p6ortvty8af0" path="res://CaveExp-Godot/Scenes/Rooms/room_top.tscn" id="9_57iid"]
+[ext_resource type="PackedScene" uid="uid://b0oy1tcsqij0j" path="res://CaveExp-Godot/Scenes/Rooms/room_vertical.tscn" id="10_3wubo"]
 
 [node name="Main" type="Node" unique_id=1370022438]
 
 [node name="Player" parent="." unique_id=1088978412 instance=ExtResource("3_8gbba")]
-position = Vector2(-66, -3)
+position = Vector2(96, -64)
 
-[node name="Dirt" type="TileMapLayer" parent="." unique_id=825281796]
-texture_filter = 1
-use_parent_material = true
-position = Vector2(1, 0)
-tile_map_data = PackedByteArray("AAAMAAIACwAAAAAAAAALAAIACwAAAAAAAAAKAAIACwAAAAAAAAAJAAIACwAAAAAAAAAIAAIACwAAAAAAAAAHAAIACwAAAAAAAAAGAAIACwAAAAAAAAAFAAIACwAAAAAAAAAEAAIACwAAAAAAAAADAAIACwAAAAAAAAACAAIACwAAAAAAAAABAAIACwAAAAAAAAAAAAIACwAAAAAAAAD//wIACwAAAAAAAAD+/wIACwAAAAAAAAD9/wIACwAAAAAAAAD8/wIACwAAAAAAAAD7/wIACwAAAAAAAAD6/wIACwAAAAAAAAD5/wIACwAAAAAAAAD4/wIACwAAAAAAAAD3/wIACwAAAAAAAAD2/wIACwAAAAAAAAD1/wIACwAAAAAAAAD0/wIACwAAAAAAAADz/wIACwAAAAAAAADy/wIACwAAAAAAAADx/wIACwAAAAAAAADw/wIACwAAAAAAAADv/wIACwAAAAAAAADu/wIACwAAAAAAAADt/wIACwAAAAAAAADs/wIACwAAAAAAAAA=")
-tile_set = SubResource("TileSet_8gbba")
-collision_visibility_mode = 1
-
-[node name="Spikes" parent="." unique_id=1045495095 instance=ExtResource("2_iwedk")]
-position = Vector2(1, 0)
-tile_map_data = PackedByteArray("AADu/wEAAAAAAAAAAAA=")
-
-[node name="Bat" parent="." unique_id=357385223 instance=ExtResource("5_153kn")]
-position = Vector2(75, -98)
+[node name="LevelGenerator" type="Node2D" parent="." unique_id=1363672773]
+script = ExtResource("2_mlvgt")
+RoomPool = Array[PackedScene]([ExtResource("3_2b1ek"), ExtResource("4_kmkin"), ExtResource("5_btrym"), ExtResource("6_d2s1b"), ExtResource("7_iti1e"), ExtResource("8_a67ly"), ExtResource("9_57iid"), ExtResource("10_3wubo")])
