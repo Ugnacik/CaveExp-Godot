@@ -32,18 +32,18 @@ metadata/_edit_group_ = true
 [node name="Dirt" type="TileMapLayer" parent="." unique_id=150389059]
 texture_filter = 1
 use_parent_material = true
-tile_map_data = PackedByteArray("AAAAAP//CwAAAAAAAAABAP//CwAAAAAAAAACAP//CwAAAAAAAAADAP//CwAAAAAAAAAEAP//CwAAAAAAAAAHAP//CwAAAAAAAAAIAP//CwAAAAAAAAAJAP//CwAAAAAAAAAKAP//CwAAAAAAAAALAP//CwAAAAAAAAALAP7/CwAAAAAAAAALAP3/CwAAAAAAAAALAPn/CwAAAAAAAAALAPj/CwAAAAAAAAALAPf/CwAAAAAAAAAKAPf/CwAAAAAAAAAJAPf/CwAAAAAAAAAIAPf/CwAAAAAAAAAHAPf/CwAAAAAAAAAEAPf/CwAAAAAAAAADAPf/CwAAAAAAAAACAPf/CwAAAAAAAAABAPf/CwAAAAAAAAAAAPf/CwAAAAAAAAAAAPj/CwAAAAAAAAAAAPn/CwAAAAAAAAAAAP3/CwAAAAAAAAAAAP7/CwAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAAAAAACwAAAAAAAAAAAAEACwAAAAAAAAAAAAIACwAAAAAAAAAAAAYACwAAAAAAAAAAAAcACwAAAAAAAAAAAAgACwAAAAAAAAABAAAACwAAAAAAAAABAAgACwAAAAAAAAACAAAACwAAAAAAAAACAAgACwAAAAAAAAADAAAACwAAAAAAAAADAAgACwAAAAAAAAAEAAAACwAAAAAAAAAEAAgACwAAAAAAAAAHAAAACwAAAAAAAAAHAAgACwAAAAAAAAAIAAAACwAAAAAAAAAIAAgACwAAAAAAAAAJAAAACwAAAAAAAAAJAAgACwAAAAAAAAAKAAAACwAAAAAAAAAKAAgACwAAAAAAAAALAAAACwAAAAAAAAALAAEACwAAAAAAAAALAAIACwAAAAAAAAALAAYACwAAAAAAAAALAAcACwAAAAAAAAALAAgACwAAAAAAAAA=")
 tile_set = SubResource("TileSet_rx64x")
 collision_visibility_mode = 1
 
-[node name="EntryTop" type="Marker2D" parent="." unique_id=1863289358]
-position = Vector2(96, -144)
-
-[node name="EntyBottom" type="Marker2D" parent="." unique_id=1643298272]
+[node name="EntryTop" type="Marker2D" parent="." unique_id=1978772981]
 position = Vector2(96, 0)
 
-[node name="EntryLeft" type="Marker2D" parent="." unique_id=1692697266]
-position = Vector2(0, -72)
+[node name="EntyBottom" type="Marker2D" parent="." unique_id=38537701]
+position = Vector2(96, 144)
 
-[node name="EntryRight" type="Marker2D" parent="." unique_id=1061881126]
-position = Vector2(192, -72)
+[node name="EntryLeft" type="Marker2D" parent="." unique_id=204268720]
+position = Vector2(0, 72)
+
+[node name="EntryRight" type="Marker2D" parent="." unique_id=1054296314]
+position = Vector2(192, 72)
