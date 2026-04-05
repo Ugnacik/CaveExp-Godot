@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://bmktgbt1k7hht"]
 
 [ext_resource type="Script" uid="uid://cyphqkos4bqmh" path="res://CaveExp-Godot/Scripts/LevelGeneration/LevelGenerator.cs" id="2_mlvgt"]
-[ext_resource type="PackedScene" uid="uid://djkxntegrktgg" path="res://CaveExp-Godot/Scenes/Rooms/room.tscn" id="3_2b1ek"]
+[ext_resource type="PackedScene" uid="uid://djkxntegrktgg" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room.tscn" id="3_2b1ek"]
 [ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://CaveExp-Godot/Scenes/Entities/player.tscn" id="3_8gbba"]
-[ext_resource type="PackedScene" uid="uid://c735uxofcx7ag" path="res://CaveExp-Godot/Scenes/Rooms/room_bottom.tscn" id="4_kmkin"]
-[ext_resource type="PackedScene" uid="uid://yj11i72njgw3" path="res://CaveExp-Godot/Scenes/Rooms/room_cross.tscn" id="5_btrym"]
-[ext_resource type="PackedScene" uid="uid://dsc7kcblbn5rj" path="res://CaveExp-Godot/Scenes/Rooms/room_horizontal.tscn" id="6_d2s1b"]
-[ext_resource type="PackedScene" uid="uid://bsgdrd3mjsy5f" path="res://CaveExp-Godot/Scenes/Rooms/room_left.tscn" id="7_iti1e"]
-[ext_resource type="PackedScene" uid="uid://c47pr8q43yu5o" path="res://CaveExp-Godot/Scenes/Rooms/room_right.tscn" id="8_a67ly"]
-[ext_resource type="PackedScene" uid="uid://p6ortvty8af0" path="res://CaveExp-Godot/Scenes/Rooms/room_top.tscn" id="9_57iid"]
-[ext_resource type="PackedScene" uid="uid://b0oy1tcsqij0j" path="res://CaveExp-Godot/Scenes/Rooms/room_vertical.tscn" id="10_3wubo"]
+[ext_resource type="PackedScene" uid="uid://c735uxofcx7ag" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room_bottom.tscn" id="4_kmkin"]
+[ext_resource type="PackedScene" uid="uid://yj11i72njgw3" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room_cross.tscn" id="5_btrym"]
+[ext_resource type="PackedScene" uid="uid://dsc7kcblbn5rj" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room_horizontal.tscn" id="6_d2s1b"]
+[ext_resource type="PackedScene" uid="uid://bsgdrd3mjsy5f" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room_left.tscn" id="7_iti1e"]
+[ext_resource type="PackedScene" uid="uid://c47pr8q43yu5o" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room_right.tscn" id="8_a67ly"]
+[ext_resource type="PackedScene" uid="uid://p6ortvty8af0" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room_top.tscn" id="9_57iid"]
+[ext_resource type="PackedScene" uid="uid://b0oy1tcsqij0j" path="res://CaveExp-Godot/Scenes/Rooms/RoomScenes/room_vertical.tscn" id="10_3wubo"]
 
 [node name="Main" type="Node" unique_id=1370022438]
 

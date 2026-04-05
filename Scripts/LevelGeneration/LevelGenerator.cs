@@ -1,6 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using Godot.Collections;
+
 
 public partial class LevelGenerator : Node2D
 {
@@ -10,6 +12,7 @@ public partial class LevelGenerator : Node2D
     [Export] public Vector2 RoomSize = new Vector2(12, 8);
 
     private Room[,] _placedRooms;
+    private List<Vector2I> _mainPath;
 
     private Random _random = new Random();
 
@@ -21,16 +24,63 @@ public partial class LevelGenerator : Node2D
     private void GenerateLevel()
     {
         _placedRooms = new Room[GridSize.X, GridSize.Y];
+        _mainPath = GeneratePath();
 
-        for (int y = 0; y < GridSize.Y; y++)
+        for (int x = 0; x < GridSize.X; x++)
         {
-            for (int x = 0; x < GridSize.X; x++)
+            for (int y = 0; y < GridSize.Y; y++)
             {
-                SpawnRoom(new Vector2I(x, y));
+                var pos = new Vector2I(x, y);
+
+                if (_mainPath.Contains(pos))
+                    SpawnPathRoom(pos);
+                else
+                    SpawnRoom(pos);
             }
         }
     }
 
+    private List<Vector2I> GeneratePath()
+    {
+        var path = new List<Vector2I>();
+        var current = new Vector2I(0, 0);
+
+        path.Add(current);
+
+        while (current.Y < GridSize.Y - 1)
+        {
+            // randomly go right or down
+            if (_random.Next(2) == 0 && current.X < GridSize.X - 1)
+                current.X += 1;
+            else
+                current.Y += 1;
+
+            path.Add(current);
+        }
+
+        return path;
+    }
+    private void SpawnPathRoom(Vector2I pos)
+    {
+        var validRooms = GetValidRooms(pos);
+
+        // 🔥 EXTRA FILTER: must connect to path neighbors
+        validRooms = FilterPathRooms(validRooms, pos);
+
+        if (validRooms.Count == 0)
+            validRooms = RoomPool;
+
+        var scene = validRooms[_random.Next(validRooms.Count)];
+        var room = scene.Instantiate<Room>();
+
+        room.Position = new Vector2(
+            pos.X * RoomSize.X * 16,
+            pos.Y * RoomSize.Y * 16
+        );
+
+        AddChild(room);
+        _placedRooms[pos.X, pos.Y] = room;
+    }
     private void SpawnRoom(Vector2I pos)
     {
         var validRooms = GetValidRooms(pos);
@@ -89,5 +139,48 @@ public partial class LevelGenerator : Node2D
         }
 
         return valid;
+    }
+    private Godot.Collections.Array<PackedScene> FilterPathRooms(
+    Godot.Collections.Array<PackedScene> rooms,
+    Vector2I pos)
+    {
+        var result = new Godot.Collections.Array<PackedScene>();
+
+        foreach (var scene in rooms)
+        {
+            var temp = scene.Instantiate<Room>();
+
+            bool connectsToPath = false;
+
+            // check neighbors in path
+            var directions = new Vector2I[]
+            {
+            new Vector2I(-1, 0),
+            new Vector2I(1, 0),
+            new Vector2I(0, -1),
+            new Vector2I(0, 1)
+            };
+
+            foreach (var dir in directions)
+            {
+                var neighbor = pos + dir;
+
+                if (_mainPath.Contains(neighbor))
+                {
+                    // check if openings match direction
+                    if (dir == new Vector2I(-1, 0) && temp.OpeningLeft) connectsToPath = true;
+                    if (dir == new Vector2I(1, 0) && temp.OpeningRight) connectsToPath = true;
+                    if (dir == new Vector2I(0, -1) && temp.OpeningTop) connectsToPath = true;
+                    if (dir == new Vector2I(0, 1) && temp.OpeningBottom) connectsToPath = true;
+                }
+            }
+
+            if (connectsToPath)
+                result.Add(scene);
+
+            temp.QueueFree();
+        }
+
+        return result;
     }
 }
