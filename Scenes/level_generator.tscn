@@ -32,5 +32,3 @@ tile_set = SubResource("TileSet_gj4lq")
 collision_visibility_mode = 1
 
 [node name="Spikes" parent="." unique_id=1045495095 instance=ExtResource("3_mqkeq")]
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=1829651256]
