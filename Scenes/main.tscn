@@ -1,9 +1,8 @@
 [gd_scene format=3 uid="uid://bmktgbt1k7hht"]
 
-[ext_resource type="Script" uid="uid://cyphqkos4bqmh" path="res://CaveExp-Godot/Scripts/LevelGeneration/LevelGenerator.cs" id="2_mlvgt"]
 [ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://CaveExp-Godot/Scenes/Entities/player.tscn" id="3_8gbba"]
+[ext_resource type="PackedScene" uid="uid://dohlodpmpyd8l" path="res://CaveExp-Godot/Scenes/level_generator.tscn" id="3_iwedk"]
 [ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="3_sltrv"]
-[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://CaveExp-Godot/Scenes/DamageObjects/spikes.tscn" id="4_iwedk"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_iwedk"]
 texture = ExtResource("3_sltrv")
@@ -35,13 +34,4 @@ collision_visibility_mode = 1
 [node name="Player" parent="." unique_id=1088978412 instance=ExtResource("3_8gbba")]
 position = Vector2(96, -64)
 
-[node name="LevelGenerator" type="Node2D" parent="." unique_id=1363672773]
-script = ExtResource("2_mlvgt")
-
-[node name="Dirt" type="TileMapLayer" parent="LevelGenerator" unique_id=399376826]
-texture_filter = 1
-use_parent_material = true
-tile_set = SubResource("TileSet_153kn")
-collision_visibility_mode = 1
-
-[node name="Spikes" parent="LevelGenerator" unique_id=1045495095 instance=ExtResource("4_iwedk")]
+[node name="LevelGenerator" parent="." unique_id=1157705696 instance=ExtResource("3_iwedk")]

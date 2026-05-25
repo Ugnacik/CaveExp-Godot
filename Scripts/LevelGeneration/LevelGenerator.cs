@@ -2,12 +2,13 @@ using Godot;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-
-
 public partial class LevelGenerator : Node2D
 {
     TileMapLayer dirtLayer;
     TileMapLayer spikeLayer;
+
+    Sprite2D entranceSprite;
+    Sprite2D exitSprite;
 
     private Random rng = new Random();
     private List<RoomData> rooms;
@@ -18,6 +19,9 @@ public partial class LevelGenerator : Node2D
     {
         dirtLayer = GetNode<TileMapLayer>("Dirt");
         spikeLayer = GetNode<TileMapLayer>("Spikes");
+
+        entranceSprite = GetNode<Sprite2D>("EntranceSprite");
+        exitSprite = GetNode<Sprite2D>("ExitSprite");
 
         rooms = RoomLoader.Load("res://CaveExp-Godot/Scenes/Rooms/basic_rooms.json");
         GD.Print($"Rooms loaded: {rooms.Count}");
@@ -40,7 +44,6 @@ public partial class LevelGenerator : Node2D
 
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
         {
-            // 70% chance to snake horizontally before dropping
             bool snake = rng.Next(10) < 7;
 
             if (snake)
@@ -60,13 +63,19 @@ public partial class LevelGenerator : Node2D
                 }
             }
 
-            // Drop down (unless this is the last row)
             if (y < Constants.GRID_HEIGHT - 1)
                 AddConnection(connections, col, y, col, y + 1, Direction.Bottom, Direction.Top);
         }
 
         exitRoom = new Vector2I(col, Constants.GRID_HEIGHT - 1);
         GD.Print($"Entrance: {entranceRoom}, Exit: {exitRoom}");
+
+        // --- Count vertical drops per column from solution path ---
+        int[] verticalDropsInColumn = new int[Constants.GRID_WIDTH];
+        for (int y = 0; y < Constants.GRID_HEIGHT; y++)
+            for (int x = 0; x < Constants.GRID_WIDTH; x++)
+                if (connections[x, y].Contains(Direction.Bottom))
+                    verticalDropsInColumn[x]++;
 
         // --- Fill off-path rooms ---
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
@@ -75,13 +84,11 @@ public partial class LevelGenerator : Node2D
             {
                 if (connections[x, y].Count > 0) continue;
 
-                // Guarantee at least one horizontal connection by picking a side first
                 bool canGoLeft = x > 0;
                 bool canGoRight = x < Constants.GRID_WIDTH - 1;
 
                 if (canGoLeft && canGoRight)
                 {
-                    // Forced: connect toward whichever neighbor is more connected (or random if equal)
                     int leftCount = connections[x - 1, y].Count;
                     int rightCount = connections[x + 1, y].Count;
 
@@ -94,7 +101,6 @@ public partial class LevelGenerator : Node2D
                     else
                         AddConnection(connections, x, y, x + 1, y, Direction.Right, Direction.Left);
 
-                    // 75% chance to also connect the other side
                     if (rng.Next(4) != 0)
                     {
                         if (!connections[x, y].Contains(Direction.Left) && canGoLeft)
@@ -108,9 +114,15 @@ public partial class LevelGenerator : Node2D
                 else if (canGoRight)
                     AddConnection(connections, x, y, x + 1, y, Direction.Right, Direction.Left);
 
-                // Vertical — 33% chance, unchanged
-                if (y < Constants.GRID_HEIGHT - 1 && rng.Next(3) == 0)
+                // Vertical — capped at 2 drops per column total
+                if (y < Constants.GRID_HEIGHT - 1
+                    && verticalDropsInColumn[x] < 2
+                    && !connections[x, y + 1].Contains(Direction.Top)
+                    && rng.Next(4) == 0)
+                {
                     AddConnection(connections, x, y, x, y + 1, Direction.Bottom, Direction.Top);
+                    verticalDropsInColumn[x]++;
+                }
             }
         }
 
@@ -137,7 +149,22 @@ public partial class LevelGenerator : Node2D
             }
         }
 
+        PlaceMarkers();
+
         GD.Print($"Level generated. Entrance: {entranceRoom}, Exit: {exitRoom}");
+    }
+
+    void PlaceMarkers()
+    {
+        entranceSprite.Position = dirtLayer.MapToLocal(new Vector2I(
+            entranceRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
+            entranceRoom.Y * (Constants.ROOM_HEIGHT - 1)
+        ));
+
+        exitSprite.Position = dirtLayer.MapToLocal(new Vector2I(
+            exitRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
+            exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + Constants.ROOM_HEIGHT - 1
+        ));
     }
 
     void AddConnection(
