@@ -1,0 +1,48 @@
+[gd_scene format=4 uid="uid://2lt8w6e088cd"]
+
+[ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://CaveExp-Godot/Scenes/Entities/player.tscn" id="1_hvoek"]
+[ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="2_i7iy8"]
+[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://CaveExp-Godot/Scenes/DamageObjects/spikes.tscn" id="3_fsfgi"]
+[ext_resource type="PackedScene" uid="uid://bgkahg6w7pl7j" path="res://CaveExp-Godot/Scenes/Entities/bat.tscn" id="4_fn5wv"]
+[ext_resource type="Script" uid="uid://deka6i6iwy6mq" path="res://CaveExp-Godot/Scenes/Node2d.cs" id="5_bu3ir"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
+texture = ExtResource("2_i7iy8")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSet" id="TileSet_8gbba"]
+physics_layer_0/collision_layer = 1
+sources/11 = SubResource("TileSetAtlasSource_bo1nx")
+tile_proxies/coords_level = [[1, Vector2i(0, 0)], [11, Vector2i(0, 0)], [7, Vector2i(0, 0)], [11, Vector2i(1, 0)], [8, Vector2i(0, 0)], [11, Vector2i(2, 0)], [9, Vector2i(0, 0)], [11, Vector2i(3, 0)], [10, Vector2i(0, 0)], [11, Vector2i(4, 0)]]
+
+[node name="Main" type="Node" unique_id=1370022438]
+
+[node name="Player" parent="." unique_id=1088978412 instance=ExtResource("1_hvoek")]
+position = Vector2(-66, -3)
+
+[node name="Dirt" type="TileMapLayer" parent="." unique_id=825281796]
+texture_filter = 1
+use_parent_material = true
+position = Vector2(1, 0)
+tile_map_data = PackedByteArray("AAAMAAIACwAAAAAAAAALAAIACwAAAAAAAAAKAAIACwAAAAAAAAAJAAIACwAAAAAAAAAIAAIACwAAAAAAAAAHAAIACwAAAAAAAAAGAAIACwAAAAAAAAAFAAIACwAAAAAAAAAEAAIACwAAAAAAAAADAAIACwAAAAAAAAACAAIACwAAAAAAAAABAAIACwAAAAAAAAAAAAIACwAAAAAAAAD//wIACwAAAAAAAAD+/wIACwAAAAAAAAD9/wIACwAAAAAAAAD8/wIACwAAAAAAAAD7/wIACwAAAAAAAAD6/wIACwAAAAAAAAD5/wIACwAAAAAAAAD4/wIACwAAAAAAAAD3/wIACwAAAAAAAAD2/wIACwAAAAAAAAD1/wIACwAAAAAAAAD0/wIACwAAAAAAAADz/wIACwAAAAAAAADy/wIACwAAAAAAAADx/wIACwAAAAAAAADw/wIACwAAAAAAAADv/wIACwAAAAAAAADu/wIACwAAAAAAAADt/wIACwAAAAAAAADs/wIACwAAAAAAAAA=")
+tile_set = SubResource("TileSet_8gbba")
+collision_visibility_mode = 1
+
+[node name="Spikes" parent="." unique_id=1045495095 instance=ExtResource("3_fsfgi")]
+position = Vector2(1, 0)
+tile_map_data = PackedByteArray("AADu/wEAAAAAAAAAAAA=")
+
+[node name="Bat" parent="." unique_id=357385223 instance=ExtResource("4_fn5wv")]
+position = Vector2(75, -98)
+
+[node name="LevelGenerator" type="Node2D" parent="." unique_id=1363672773]
+script = ExtResource("5_bu3ir")

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cemkxbl7dkkeq"]
+
+[ext_resource type="Texture2D" uid="uid://orq8dyqyj1pn" path="res://CaveExp-Godot/Sprites/Level/DamageTiles/Spikes.png" id="1_xy0ys"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pw4ol"]
+texture = ExtResource("1_xy0ys")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 1.978447, 3.4173164, -4.4964676, 8, 0.8992939, 8, 8, -8, 8)
+
+[sub_resource type="TileSet" id="TileSet_pisj1"]
+physics_layer_0/collision_layer = 4
+physics_layer_0/collision_mask = 0
+sources/0 = SubResource("TileSetAtlasSource_pw4ol")
+
+[node name="Spikes" type="TileMapLayer" unique_id=1045495095]
+texture_filter = 1
+tile_set = SubResource("TileSet_pisj1")

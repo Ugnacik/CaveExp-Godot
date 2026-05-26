@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://drdkowh8smudn"]
+
+[ext_resource type="Script" uid="uid://bbj4rkj7jd0qc" path="res://CaveExp-Godot/Scripts/Enemies/Snake.cs" id="1_ymru8"]
+[ext_resource type="Texture2D" uid="uid://b8mhbeme5bcic" path="res://CaveExp-Godot/Sprites/Enemies/Snake/Attack.png" id="2_ib188"]
+[ext_resource type="Texture2D" uid="uid://q50uhlhr73d5" path="res://CaveExp-Godot/Sprites/Enemies/Snake/Walk.png" id="3_08wkr"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p48en"]
+atlas = ExtResource("2_ib188")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lmvgn"]
+atlas = ExtResource("2_ib188")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pnn8g"]
+atlas = ExtResource("2_ib188")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6tu6o"]
+atlas = ExtResource("3_08wkr")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lpoka"]
+atlas = ExtResource("3_08wkr")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rjxvt"]
+atlas = ExtResource("3_08wkr")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v1exp"]
+atlas = ExtResource("3_08wkr")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sf0t3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p48en")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lmvgn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pnn8g")
+}],
+"loop": true,
+"name": &"Attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6tu6o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lpoka")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rjxvt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v1exp")
+}],
+"loop": true,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4qsly"]
+size = Vector2(12, 16)
+
+[node name="Snake" type="CharacterBody2D" unique_id=1176825351]
+collision_layer = 9
+collision_mask = 9
+script = ExtResource("1_ymru8")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=737076210]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_sf0t3")
+animation = &"Walk"
+flip_h = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=289329295]
+position = Vector2(-2.3841858e-07, 1.9999998)
+rotation = 1.5707964
+shape = SubResource("RectangleShape2D_4qsly")
