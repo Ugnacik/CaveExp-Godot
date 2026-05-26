@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwg1y01aubrc0"
-path="res://.godot/imported/Hang.png-9b41bb8b8ca6d0ab01a01b8222e7e268.ctex"
+path="res://.godot/imported/Hang.png-2712c3391e7586959eb8304680014c7b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CaveExp-Godot/Sprites/Enemies/Bat/Hang.png"
-dest_files=["res://.godot/imported/Hang.png-9b41bb8b8ca6d0ab01a01b8222e7e268.ctex"]
+source_file="res://Sprites/Enemies/Bat/Hang.png"
+dest_files=["res://.godot/imported/Hang.png-2712c3391e7586959eb8304680014c7b.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://orq8dyqyj1pn"
-path="res://.godot/imported/Spikes.png-77298d8efe787981af155267a3d187b0.ctex"
+uid="uid://dx1p2ru22timq"
+path="res://.godot/imported/exit_0.png-6dac3a2cf502d389b6f652c66f4a5e9a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Level/DamageTiles/Spikes.png"
-dest_files=["res://.godot/imported/Spikes.png-77298d8efe787981af155267a3d187b0.ctex"]
+source_file="res://Sprites/Level/Tiles/Entrance_Exit/exit_0.png"
+dest_files=["res://.godot/imported/exit_0.png-6dac3a2cf502d389b6f652c66f4a5e9a.ctex"]
 
 [params]
 

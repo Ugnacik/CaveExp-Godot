@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b2qhaigdpnmjn"
-path="res://.godot/imported/Fly.png-d900c1b3d5d0571be17d47b9af2c07aa.ctex"
+path="res://.godot/imported/Fly.png-05c03d1c96baa6631402a0def2646980.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CaveExp-Godot/Sprites/Enemies/Bat/Fly.png"
-dest_files=["res://.godot/imported/Fly.png-d900c1b3d5d0571be17d47b9af2c07aa.ctex"]
+source_file="res://Sprites/Enemies/Bat/Fly.png"
+dest_files=["res://.godot/imported/Fly.png-05c03d1c96baa6631402a0def2646980.ctex"]
 
 [params]
 
