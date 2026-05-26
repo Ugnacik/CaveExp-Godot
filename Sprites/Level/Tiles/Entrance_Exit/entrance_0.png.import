@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b5v65hg1oudxs"
-path="res://.godot/imported/entrance_0.png-7b2f7e16981bb5f9f8b46b5eaf5293c2.ctex"
+path="res://.godot/imported/entrance_0.png-ae5eb10742a72c273eab17ffea1058dd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CaveExp-Godot/Sprites/Level/Tiles/Entrance_Exit/entrance_0.png"
-dest_files=["res://.godot/imported/entrance_0.png-7b2f7e16981bb5f9f8b46b5eaf5293c2.ctex"]
+source_file="res://Sprites/Level/Tiles/Entrance_Exit/entrance_0.png"
+dest_files=["res://.godot/imported/entrance_0.png-ae5eb10742a72c273eab17ffea1058dd.ctex"]
 
 [params]
 

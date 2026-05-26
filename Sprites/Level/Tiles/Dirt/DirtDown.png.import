@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dktcp0ew4h2qu"
-path="res://.godot/imported/DirtDown.png-1a3df5973ab2e07b204cc94283134478.ctex"
+path="res://.godot/imported/DirtDown.png-b204afe0ce037a292f0481737336d9ae.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CaveExp-Godot/Sprites/Level/Tiles/Dirt/DirtDown.png"
-dest_files=["res://.godot/imported/DirtDown.png-1a3df5973ab2e07b204cc94283134478.ctex"]
+source_file="res://Sprites/Level/Tiles/Dirt/DirtDown.png"
+dest_files=["res://.godot/imported/DirtDown.png-b204afe0ce037a292f0481737336d9ae.ctex"]
 
 [params]
 
