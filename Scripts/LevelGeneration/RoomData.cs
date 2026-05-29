@@ -12,7 +12,7 @@ public enum Direction
 }
 public class RoomData
 {
-    
+
     [JsonPropertyName("name")]
     public string name { get; set; }
 
@@ -21,6 +21,9 @@ public class RoomData
 
     [JsonPropertyName("layout")]
     public int[][] layout { get; set; }
+
+    [JsonPropertyName("markerPos")]
+    public int[]? markerPos { get; set; }
 
     // Parsed enum version (not serialized)
     [JsonIgnore]
