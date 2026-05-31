@@ -14,6 +14,8 @@ public partial class LevelGenerator : Node2D
     private List<RoomData> rooms;
     private Vector2I entranceRoom;
     private Vector2I exitRoom;
+    private RoomData selectedEntranceRoom;
+    private RoomData selectedExitRoom;
 
     public override void _Ready()
     {
@@ -23,7 +25,7 @@ public partial class LevelGenerator : Node2D
         entranceSprite = GetNode<Sprite2D>("EntranceSprite");
         exitSprite = GetNode<Sprite2D>("ExitSprite");
 
-        rooms = RoomLoader.Load("res://CaveExp-Godot/Scenes/Rooms/basic_rooms.json");
+        rooms = RoomLoader.Load("res://Scenes/Rooms/basic_rooms.json");
         GD.Print($"Rooms loaded: {rooms.Count}");
 
         GenerateLevel();
@@ -45,11 +47,17 @@ public partial class LevelGenerator : Node2D
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
         {
             bool snake = rng.Next(10) < 7;
+            if (y == 0) snake = true; // Force snaking on the top row so the entrance never has a bottom drop
 
             if (snake)
             {
                 int steps = rng.Next(1, 4);
                 int dir = rng.Next(2) == 0 ? -1 : 1;
+                if (y == 0)
+                {
+                    if (col == 0) dir = 1;
+                    else if (col == Constants.GRID_WIDTH - 1) dir = -1;
+                }
 
                 for (int s = 0; s < steps; s++)
                 {
@@ -132,8 +140,25 @@ public partial class LevelGenerator : Node2D
             for (int x = 0; x < Constants.GRID_WIDTH; x++)
             {
                 Direction[] needed = connections[x, y].ToArray();
-                RoomData room = GetRoomByConnections(needed);
-
+                RoomData room;
+                if (x == entranceRoom.X && y == entranceRoom.Y)
+                {
+                    room = rooms.FirstOrDefault(r =>
+                        r.name.StartsWith("room_entrance") &&
+                        r.connections.Length == needed.Length &&
+                        needed.All(c => r.connections.Contains(c)));
+                    selectedEntranceRoom = room;
+                }
+                else if (x == exitRoom.X && y == exitRoom.Y)
+                {
+                    room = rooms.FirstOrDefault(r =>
+                        r.name.StartsWith("room_exit") &&
+                        r.connections.Length == needed.Length &&
+                        needed.All(c => r.connections.Contains(c)));
+                    selectedExitRoom = room;
+                }
+                else
+                    room = GetRoomByConnections(needed);
                 if (room == null)
                 {
                     GD.PrintErr($"No template for [{string.Join(", ", needed)}] at ({x},{y}). Using closed room.");
@@ -156,15 +181,40 @@ public partial class LevelGenerator : Node2D
 
     void PlaceMarkers()
     {
-        entranceSprite.Position = dirtLayer.MapToLocal(new Vector2I(
-            entranceRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
-            entranceRoom.Y * (Constants.ROOM_HEIGHT - 1)
-        ));
+        Vector2 offset = dirtLayer.Position;
 
-        exitSprite.Position = dirtLayer.MapToLocal(new Vector2I(
-            exitRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
-            exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + Constants.ROOM_HEIGHT - 1
-        ));
+        if (selectedEntranceRoom == null)
+            GD.PrintErr("Missing entrance room data!");
+        if (selectedExitRoom == null)
+            GD.PrintErr("Missing exit room data!");
+
+        Vector2I entranceTile;
+        if (selectedEntranceRoom?.markerPos != null)
+            entranceTile = new Vector2I(
+                entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0],
+                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1]
+            );
+        else
+            entranceTile = new Vector2I(
+                entranceRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
+                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + 1
+            );
+
+        entranceSprite.Position = dirtLayer.MapToLocal(entranceTile) + offset;
+
+        Vector2I exitTile;
+        if (selectedExitRoom?.markerPos != null)
+            exitTile = new Vector2I(
+                exitRoom.X * (Constants.ROOM_WIDTH - 1) + selectedExitRoom.markerPos[0],
+                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedExitRoom.markerPos[1]
+            );
+        else
+            exitTile = new Vector2I(
+                exitRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
+                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + 1
+            );
+
+        exitSprite.Position = dirtLayer.MapToLocal(exitTile) + offset;
     }
 
     void AddConnection(
