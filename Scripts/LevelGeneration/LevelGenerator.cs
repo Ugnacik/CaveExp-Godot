@@ -47,11 +47,17 @@ public partial class LevelGenerator : Node2D
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
         {
             bool snake = rng.Next(10) < 7;
+            if (y == 0) snake = true; // Force snaking on the top row so the entrance never has a bottom drop
 
             if (snake)
             {
                 int steps = rng.Next(1, 4);
                 int dir = rng.Next(2) == 0 ? -1 : 1;
+                if (y == 0)
+                {
+                    if (col == 0) dir = 1;
+                    else if (col == Constants.GRID_WIDTH - 1) dir = -1;
+                }
 
                 for (int s = 0; s < steps; s++)
                 {
@@ -137,26 +143,19 @@ public partial class LevelGenerator : Node2D
                 RoomData room;
                 if (x == entranceRoom.X && y == entranceRoom.Y)
                 {
-                    Direction[] horizontalOnly = needed
-                        .Where(d => d == Direction.Left || d == Direction.Right)
-                        .ToArray();
-
                     room = rooms.FirstOrDefault(r =>
                         r.name.StartsWith("room_entrance") &&
-                        r.connections.Length == horizontalOnly.Length &&
-                        horizontalOnly.All(c => r.connections.Contains(c)));
+                        r.connections.Length == needed.Length &&
+                        needed.All(c => r.connections.Contains(c)));
                     selectedEntranceRoom = room;
                 }
                 else if (x == exitRoom.X && y == exitRoom.Y)
                 {
-                    Direction[] noBottom = needed
-                        .Where(d => d != Direction.Bottom)
-                        .ToArray();
-
                     room = rooms.FirstOrDefault(r =>
                         r.name.StartsWith("room_exit") &&
-                        r.connections.Length == noBottom.Length &&
-                        noBottom.All(c => r.connections.Contains(c)));
+                        r.connections.Length == needed.Length &&
+                        needed.All(c => r.connections.Contains(c)));
+                    selectedExitRoom = room;
                 }
                 else
                     room = GetRoomByConnections(needed);
