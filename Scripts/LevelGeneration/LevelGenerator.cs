@@ -11,7 +11,9 @@ public partial class LevelGenerator : Node2D
     Sprite2D exitSprite;
 
     private Random rng = new Random();
-    private List<RoomData> rooms;
+    private List<RoomData> entranceRooms;
+    private List<RoomData> exitRooms;
+    private List<RoomData> standardRooms;
     private Vector2I entranceRoom;
     private Vector2I exitRoom;
     private RoomData selectedEntranceRoom;
@@ -25,8 +27,10 @@ public partial class LevelGenerator : Node2D
         entranceSprite = GetNode<Sprite2D>("EntranceSprite");
         exitSprite = GetNode<Sprite2D>("ExitSprite");
 
-        rooms = RoomLoader.Load("res://Scenes/Rooms/basic_rooms.json");
-        GD.Print($"Rooms loaded: {rooms.Count}");
+        entranceRooms = RoomLoader.Load("res://Scenes/Rooms/entrance_rooms.json");
+        exitRooms = RoomLoader.Load("res://Scenes/Rooms/exit_rooms.json");
+        standardRooms = RoomLoader.Load("res://Scenes/Rooms/basic_rooms.json");
+        GD.Print($"Entrance rooms: {entranceRooms.Count}, Exit rooms: {exitRooms.Count}, Standard rooms: {standardRooms.Count}");
 
         GenerateLevel();
     }
@@ -143,16 +147,14 @@ public partial class LevelGenerator : Node2D
                 RoomData room;
                 if (x == entranceRoom.X && y == entranceRoom.Y)
                 {
-                    room = rooms.FirstOrDefault(r =>
-                        r.name.StartsWith("room_entrance") &&
+                    room = entranceRooms.FirstOrDefault(r =>
                         r.connections.Length == needed.Length &&
                         needed.All(c => r.connections.Contains(c)));
                     selectedEntranceRoom = room;
                 }
                 else if (x == exitRoom.X && y == exitRoom.Y)
                 {
-                    room = rooms.FirstOrDefault(r =>
-                        r.name.StartsWith("room_exit") &&
+                    room = exitRooms.FirstOrDefault(r =>
                         r.connections.Length == needed.Length &&
                         needed.All(c => r.connections.Contains(c)));
                     selectedExitRoom = room;
@@ -230,7 +232,7 @@ public partial class LevelGenerator : Node2D
 
     RoomData GetRoomByConnections(params Direction[] requiredConnections)
     {
-        return rooms.FirstOrDefault(room =>
+        return standardRooms.FirstOrDefault(room =>
             room.connections.Length == requiredConnections.Length &&
             requiredConnections.All(connection => room.connections.Contains(connection)));
     }
