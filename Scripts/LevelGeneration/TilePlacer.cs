@@ -1,9 +1,12 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public static class TilePlacer
 {
     const int DIRT_SOURCE_ID = 11;
+    const int SPIKE_SOURCE_ID = 0; // Already adjusted
+    
     static readonly Vector2I[] DIRT_TILES = new Vector2I[]
     {
         new Vector2I(0, 0),
@@ -13,7 +16,13 @@ public static class TilePlacer
         new Vector2I(4, 0)
     };
 
-    public static void PlaceRoom(int[][] layout, Vector2I offset, TileMapLayer layer, Random rng)
+    // Spawner registry: maps layout ID to a list of possible scenes
+    public static Dictionary<int, List<PackedScene>> SpawnerPool { get; set; } = new();
+    
+    // Node container for spawned entities
+    public static Node EntityContainer { get; set; }
+
+    public static void PlaceRoom(int[][] layout, Vector2I offset, TileMapLayer dirtLayer, TileMapLayer spikeLayer, Random rng)
     {
         for (int y = 0; y < layout.Length; y++)
         {
@@ -25,15 +34,25 @@ public static class TilePlacer
                 switch (tile)
                 {
                     case 1: // DIRT
-                        PlaceDirt(pos, layer, rng);
+                        PlaceDirt(pos, dirtLayer, rng);
+                        
+                        // If the tile directly below is air, this is a ceiling -> Spawn Bat
+                        if (y < layout.Length - 1 && layout[y + 1][x] == 0)
+                        {
+                            TrySpawnBat(pos, rng);
+                        }
                         break;
 
                     case 2: // SPIKE
-                        // PlaceSpike(...)
+                        PlaceSpike(pos, spikeLayer);
                         break;
 
-                    case 3: // ENEMY
-                        // SpawnEnemy(...)
+                    case 0: // AIR
+                        // If the tile directly below is dirt, this is a floor -> Spawn Ground Enemy
+                        if (y < layout.Length - 1 && layout[y + 1][x] == 1)
+                        {
+                            TrySpawnGroundEnemy(pos, rng);
+                        }
                         break;
                 }
             }
@@ -48,11 +67,34 @@ public static class TilePlacer
 
     public static void PlaceSpike(Vector2I pos, TileMapLayer spikeLayer)
     {
-        GD.Print($"Placing spike at {pos}");
+        spikeLayer.SetCell(pos, SPIKE_SOURCE_ID, new Vector2I(0, 0));
     }
 
-    public static void SpawnEnemy(Vector2I pos)
+    private static void TrySpawnBat(Vector2I tilePos, Random rng)
     {
-        GD.Print($"Spawning enemy at {pos}");
+        // 5% chance per valid ceiling tile
+        if (rng.NextDouble() > 0.05) return;
+        TrySpawnEntity(3, tilePos, rng); // ID 3 = Bat
+    }
+
+    private static void TrySpawnGroundEnemy(Vector2I tilePos, Random rng)
+    {
+        // 5% chance per valid floor tile
+        if (rng.NextDouble() > 0.05) return;
+        TrySpawnEntity(4, tilePos, rng); // ID 4 = Ground Enemy
+    }
+
+    private static void TrySpawnEntity(int spawnerId, Vector2I tilePos, Random rng)
+    {
+        if (EntityContainer == null || !SpawnerPool.TryGetValue(spawnerId, out var pool) || pool.Count == 0)
+            return;
+
+        var scene = pool[rng.Next(pool.Count)];
+        var instance = scene.Instantiate<Node2D>();
+        
+        // Convert tile map position to world position (assuming 16x16 tiles)
+        instance.Position = new Vector2(tilePos.X * 16 + 8, tilePos.Y * 16 + 8);
+        
+        EntityContainer.AddChild(instance);
     }
 }
