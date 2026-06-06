@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://dohlodpmpyd8l"]
 
-[ext_resource type="Script" uid="uid://cyphqkos4bqmh" path="res://CaveExp-Godot/Scripts/LevelGeneration/LevelGenerator.cs" id="1_b1ki7"]
-[ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="2_m4suv"]
-[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://CaveExp-Godot/Scenes/DamageObjects/spikes.tscn" id="3_mqkeq"]
-[ext_resource type="Texture2D" uid="uid://b5v65hg1oudxs" path="res://CaveExp-Godot/Sprites/Level/Tiles/Entrance_Exit/entrance_0.png" id="4_mqkeq"]
-[ext_resource type="Texture2D" uid="uid://dx1p2ru22timq" path="res://CaveExp-Godot/Sprites/Level/Tiles/Entrance_Exit/exit_0.png" id="5_h1mju"]
+[ext_resource type="Script" uid="uid://cyphqkos4bqmh" path="res://Scripts/LevelGeneration/LevelGenerator.cs" id="1_b1ki7"]
+[ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://Sprites/Level/TileSets/Dirt.png" id="2_m4suv"]
+[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://Scenes/DamageObjects/spikes.tscn" id="3_mqkeq"]
+[ext_resource type="Texture2D" uid="uid://b5v65hg1oudxs" path="res://Sprites/Level/Tiles/Entrance_Exit/entrance_0.png" id="4_mqkeq"]
+[ext_resource type="Texture2D" uid="uid://dx1p2ru22timq" path="res://Sprites/Level/Tiles/Entrance_Exit/exit_0.png" id="5_h1mju"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_h1mju"]
 texture = ExtResource("2_m4suv")
@@ -44,3 +44,5 @@ texture = ExtResource("4_mqkeq")
 
 [node name="ExitSprite" type="Sprite2D" parent="." unique_id=982826132]
 texture = ExtResource("5_h1mju")
+
+[node name="Entities" type="Node2D" parent="." unique_id=354114495]

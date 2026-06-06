@@ -32,6 +32,21 @@ public partial class LevelGenerator : Node2D
         standardRooms = RoomLoader.Load("res://Scenes/Rooms/basic_rooms.json");
         GD.Print($"Entrance rooms: {entranceRooms.Count}, Exit rooms: {exitRooms.Count}, Standard rooms: {standardRooms.Count}");
 
+        // Set up entity container (create an empty Node2D called "Entities" in your scene tree)
+        TilePlacer.EntityContainer = GetNode("Entities");
+
+        TilePlacer.SpawnerPool = new Dictionary<int, List<PackedScene>>
+        {
+            [3] = new List<PackedScene>
+            {
+                GD.Load<PackedScene>("res://Scenes/Entities/bat.tscn")
+            },
+            [4] = new List<PackedScene>
+            {
+                GD.Load<PackedScene>("res://Scenes/Entities/snake.tscn")
+            }
+        };
+
         GenerateLevel();
     }
 
@@ -51,12 +66,12 @@ public partial class LevelGenerator : Node2D
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
         {
             // Increased to 90% to naturally reduce straight drops
-            bool snake = rng.Next(10) < 9; 
-            if (y == 0) snake = true; 
+            bool snake = rng.Next(10) < 9;
+            if (y == 0) snake = true;
 
             if (snake)
             {
-                int steps = rng.Next(1, 4); 
+                int steps = rng.Next(1, 4);
                 int dir = rng.Next(2) == 0 ? -1 : 1;
                 if (y == 0)
                 {
@@ -112,9 +127,9 @@ public partial class LevelGenerator : Node2D
             }
 
             int roll = rng.Next(100);
-            if (roll < 88) offPathDropsAllowed[x] = 0;  
-            else if (roll < 99) offPathDropsAllowed[x] = 1;  
-            else offPathDropsAllowed[x] = 2;  
+            if (roll < 88) offPathDropsAllowed[x] = 0;
+            else if (roll < 99) offPathDropsAllowed[x] = 1;
+            else offPathDropsAllowed[x] = 2;
 
             int cap = 2;
             if (verticalDropsInColumn[x] + offPathDropsAllowed[x] > cap)
@@ -208,7 +223,7 @@ public partial class LevelGenerator : Node2D
                     y * (Constants.ROOM_HEIGHT - 1)
                 );
 
-                TilePlacer.PlaceRoom(room.layout, offset, dirtLayer, rng);
+                TilePlacer.PlaceRoom(room.layout, offset, dirtLayer, spikeLayer, rng);
             }
         }
 
@@ -233,7 +248,7 @@ public partial class LevelGenerator : Node2D
                 entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1]
             );
         else
-            entranceTile = new Vector2I( 
+            entranceTile = new Vector2I(
                 entranceRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
                 entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + 1
             );
@@ -268,8 +283,13 @@ public partial class LevelGenerator : Node2D
 
     RoomData GetRoomByConnections(params Direction[] requiredConnections)
     {
-        return standardRooms.FirstOrDefault(room =>
+        var matchingRooms = standardRooms.Where(room =>
             room.connections.Length == requiredConnections.Length &&
-            requiredConnections.All(connection => room.connections.Contains(connection)));
+            requiredConnections.All(connection => room.connections.Contains(connection))).ToList();
+
+        if (matchingRooms.Count == 0) return null;
+
+        // Pick a random template from the valid ones
+        return matchingRooms[rng.Next(matchingRooms.Count)];
     }
 }
