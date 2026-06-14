@@ -5,11 +5,12 @@ using System.Collections.Generic;
 
 public partial class LevelGenerator : Node2D
 {
+    [Export] public PackedScene PlayerScene;
     TileMapLayer dirtLayer;
     TileMapLayer spikeLayer;
     Sprite2D entranceSprite;
     Sprite2D exitSprite;
-
+    
     private Random rng = new Random();
     private List<RoomData> entranceRooms;
     private List<RoomData> exitRooms;
@@ -195,14 +196,17 @@ public partial class LevelGenerator : Node2D
             {
                 Direction[] needed = connections[x, y].ToArray();
                 RoomData room;
-                if (x == entranceRoom.X && y == entranceRoom.Y)
+                bool isEntrance = (x == entranceRoom.X && y == entranceRoom.Y);
+                bool isExit = (x == exitRoom.X && y == exitRoom.Y);
+
+                if (isEntrance)
                 {
                     room = entranceRooms.FirstOrDefault(r =>
                         r.connections.Length == needed.Length &&
                         needed.All(c => r.connections.Contains(c)));
                     selectedEntranceRoom = room;
                 }
-                else if (x == exitRoom.X && y == exitRoom.Y)
+                else if (isExit)
                 {
                     room = exitRooms.FirstOrDefault(r =>
                         r.connections.Length == needed.Length &&
@@ -210,7 +214,9 @@ public partial class LevelGenerator : Node2D
                     selectedExitRoom = room;
                 }
                 else
+                {
                     room = GetRoomByConnections(needed);
+                }
 
                 if (room == null)
                 {
@@ -223,15 +229,40 @@ public partial class LevelGenerator : Node2D
                     y * (Constants.ROOM_HEIGHT - 1)
                 );
 
-                TilePlacer.PlaceRoom(room.layout, offset, dirtLayer, spikeLayer, rng);
+                // Determine allowed spawns based on room type
+                SpawnFlags allowedSpawns = SpawnFlags.All;
+                if (isEntrance)
+                    allowedSpawns = SpawnFlags.None; // Only entrance is completely safe
+
+                TilePlacer.PlaceRoom(room.layout, offset, dirtLayer, spikeLayer, rng, allowedSpawns);
             }
         }
 
         PlaceMarkers();
+        SpawnPlayer();
 
         GD.Print($"Level generated. Entrance: {entranceRoom}, Exit: {exitRoom}");
     }
+    void SpawnPlayer()
+    {
+        if (PlayerScene == null || selectedEntranceRoom == null) return;
 
+        var playerInstance = PlayerScene.Instantiate<Node2D>();
+        
+        // Calculate world position from tile coordinates
+        // markerPos is in tiles, so we multiply by tile size (assuming 16x16)
+        int tileX = entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0];
+        int tileY = entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1];
+        
+        // MapToLocal converts tile coords to local space of the TileMapLayer
+        Vector2 worldPos = dirtLayer.MapToLocal(new Vector2I(tileX, tileY));
+        
+        // Add the layer's global position to get true world space
+        playerInstance.GlobalPosition = worldPos + dirtLayer.GlobalPosition;
+
+        AddChild(playerInstance);
+        GD.Print($"Player spawned at {playerInstance.GlobalPosition}");
+    }
     void PlaceMarkers()
     {
         Vector2 offset = dirtLayer.Position;

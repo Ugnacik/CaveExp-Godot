@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cl8jf1j7kmch4"]
 
-[ext_resource type="Script" uid="uid://1x5xup6ky0kx" path="res://CaveExp-Godot/Scripts/Player/Player.cs" id="1_82m87"]
-[ext_resource type="Texture2D" uid="uid://gcrod4wgst84" path="res://CaveExp-Godot/Sprites/Player/Player.png" id="1_r6ure"]
-[ext_resource type="Texture2D" uid="uid://nyrhwyf6lwic" path="res://CaveExp-Godot/Sprites/Player/Player_Run.png" id="3_82m87"]
+[ext_resource type="Script" uid="uid://1x5xup6ky0kx" path="res://Scripts/Player/Player.cs" id="1_82m87"]
+[ext_resource type="Texture2D" uid="uid://gcrod4wgst84" path="res://Sprites/Player/Player.png" id="1_r6ure"]
+[ext_resource type="Texture2D" uid="uid://nyrhwyf6lwic" path="res://Sprites/Player/Player_Run.png" id="3_82m87"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_soeho"]
 animations = [{
