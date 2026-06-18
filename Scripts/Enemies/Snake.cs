@@ -4,39 +4,55 @@ public partial class Snake : Enemy
 {
     [Export] public float PatrolSpeed = 50f;
 
-    public override void _Ready()
+    /// <summary>
+    /// Snakes require at least one open horizontal neighbor to patrol.
+    /// Uses TestMove to respect actual collision shape size.
+    /// </summary>
+    protected override bool ValidateSpawnPosition()
     {
-        base._Ready();
+        bool wallLeft = TestMove(GlobalTransform, new Vector2(-2f, 0));
+        bool wallRight = TestMove(GlobalTransform, new Vector2(2f, 0));
+        return !(wallLeft && wallRight);
     }
 
     public override void _PhysicsProcess(double delta)
     {
         float dt = (float)delta;
 
-        // 1. Apply gravity
+        // Always apply gravity so trapped snakes don't float
         if (!IsOnFloor())
+        {
             Velocity += new Vector2(0, 900f * dt);
+        }
+        else if (!_canPatrol)
+        {
+            // Stop horizontal movement but preserve vertical (gravity)
+            Velocity = new Vector2(0, Velocity.Y);
+        }
+        else
+        {
+            Velocity = new Vector2(_direction * PatrolSpeed, Velocity.Y);
+        }
 
-        // 2. Set horizontal movement based on current direction
-        Velocity = new Vector2(_direction * PatrolSpeed, Velocity.Y);
-
-        // 3. Call base to execute MoveAndSlide() and HandlePlayerCollision()
-        // This ensures the snake moves with the newly calculated Velocity
+        // Execute movement and player collision checks
         base._PhysicsProcess(delta);
 
-        // 4. Update visuals
-        UpdateAnimation();
+        // Only handle patrol logic when we have space
+        if (_canPatrol)
+        {
+            UpdateAnimation();
 
-        // 5. Handle turning logic AFTER moving and resolving collisions
-        if (IsOnWall())
-        {
-            TurnAround();
+            if (IsOnWall())
+                TurnAround();
+            else if (IsOnFloor() && IsAtLedge())
+                TurnAround();
         }
-        // Use 'else if' to prevent double-flipping if the snake gets stuck in a corner
-        // (where it touches both a wall and a ledge at the same time)
-        else if (IsOnFloor() && IsAtLedge())
+        else
         {
-            TurnAround();
+            // Idle visual state
+            if (_animatedSprite.Animation != "Walk")
+                _animatedSprite.Play("Walk");
+            _animatedSprite.Pause();
         }
     }
 
