@@ -34,7 +34,7 @@ public partial class LevelGenerator : Node2D
 
         entranceRooms = RoomLoader.Load("res://Scenes/Rooms/entrance_rooms.json");
         exitRooms = RoomLoader.Load("res://Scenes/Rooms/exit_rooms.json");
-        standardRooms = RoomLoader.Load("res://Scenes/Rooms/rooms.json");
+        standardRooms = RoomLoader.Load("res://Scenes/Rooms/standard_rooms.json");
 
         GD.Print($"Entrance rooms: {entranceRooms.Count}, Exit rooms: {exitRooms.Count}, Standard rooms: {standardRooms.Count}");
 
