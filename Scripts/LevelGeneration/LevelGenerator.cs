@@ -10,7 +10,7 @@ public partial class LevelGenerator : Node2D
     TileMapLayer spikeLayer;
     Sprite2D entranceSprite;
     Sprite2D exitSprite;
-    
+
     private Random rng = new Random();
     private List<RoomData> entranceRooms;
     private List<RoomData> exitRooms;
@@ -30,7 +30,7 @@ public partial class LevelGenerator : Node2D
 
         entranceRooms = RoomLoader.Load("res://Scenes/Rooms/entrance_rooms.json");
         exitRooms = RoomLoader.Load("res://Scenes/Rooms/exit_rooms.json");
-        standardRooms = RoomLoader.Load("res://Scenes/Rooms/basic_rooms.json");
+        standardRooms = RoomLoader.Load("res://Scenes/Rooms/rooms.json");
         GD.Print($"Entrance rooms: {entranceRooms.Count}, Exit rooms: {exitRooms.Count}, Standard rooms: {standardRooms.Count}");
 
         // Set up entity container (create an empty Node2D called "Entities" in your scene tree)
@@ -54,6 +54,7 @@ public partial class LevelGenerator : Node2D
     void GenerateLevel()
     {
         dirtLayer.Clear();
+        TilePlacer.ClearSpawnedPositions();
 
         var connections = new HashSet<Direction>[Constants.GRID_WIDTH, Constants.GRID_HEIGHT];
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
@@ -248,15 +249,15 @@ public partial class LevelGenerator : Node2D
         if (PlayerScene == null || selectedEntranceRoom == null) return;
 
         var playerInstance = PlayerScene.Instantiate<Node2D>();
-        
+
         // Calculate world position from tile coordinates
         // markerPos is in tiles, so we multiply by tile size (assuming 16x16)
         int tileX = entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0];
         int tileY = entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1];
-        
+
         // MapToLocal converts tile coords to local space of the TileMapLayer
         Vector2 worldPos = dirtLayer.MapToLocal(new Vector2I(tileX, tileY));
-        
+
         // Add the layer's global position to get true world space
         playerInstance.GlobalPosition = worldPos + dirtLayer.GlobalPosition;
 

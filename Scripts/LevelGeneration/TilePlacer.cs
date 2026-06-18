@@ -22,6 +22,12 @@ public static class TilePlacer
     // Node container for spawned entities
     public static Node EntityContainer { get; set; }
 
+    private static HashSet<Vector2> _occupiedSpawnPositions = new();
+
+    public static void ClearSpawnedPositions() => _occupiedSpawnPositions.Clear();
+
+
+
 
     public static void PlaceRoom(
         int[][] layout,
@@ -40,6 +46,16 @@ public static class TilePlacer
 
                 switch (tile)
                 {
+                    case 0: // AIR
+                        if (allowedSpawns.HasFlag(SpawnFlags.GroundEnemy)
+                            && y < layout.Length - 1
+                            && layout[y + 1][x] == 1
+                            && GetLedgeWidth(layout, x, y) >= 3)
+                        {
+                            TrySpawnGroundEnemy(pos, rng);
+                        }
+                        break;
+
                     case 1: // DIRT
                         PlaceDirt(pos, dirtLayer, rng);
 
@@ -54,16 +70,6 @@ public static class TilePlacer
 
                     case 2: // SPIKE
                         PlaceSpike(pos, spikeLayer);
-                        break;
-
-                    case 0: // AIR
-                            // Only spawn ground enemies if the flag allows it
-                        if (allowedSpawns.HasFlag(SpawnFlags.GroundEnemy)
-                            && y < layout.Length - 1
-                            && layout[y + 1][x] == 1)
-                        {
-                            TrySpawnGroundEnemy(pos, rng);
-                        }
                         break;
                 }
             }
@@ -100,12 +106,27 @@ public static class TilePlacer
         if (EntityContainer == null || !SpawnerPool.TryGetValue(spawnerId, out var pool) || pool.Count == 0)
             return;
 
+        Vector2 basePos = new Vector2(tilePos.X * 16 + 8, tilePos.Y * 16 + 8);
+
+        if (_occupiedSpawnPositions.Contains(basePos - new Vector2(16, 0))
+         || _occupiedSpawnPositions.Contains(basePos)
+         || _occupiedSpawnPositions.Contains(basePos + new Vector2(16, 0)))
+            return;
+
+        _occupiedSpawnPositions.Add(basePos);
+
         var scene = pool[rng.Next(pool.Count)];
         var instance = scene.Instantiate<Node2D>();
-
-        // Convert tile map position to world position (assuming 16x16 tiles)
-        instance.Position = new Vector2(tilePos.X * 16 + 8, tilePos.Y * 16 + 8);
-
+        instance.Position = basePos;
         EntityContainer.AddChild(instance);
+    }
+    private static int GetLedgeWidth(int[][] layout, int x, int y)
+    {
+        int width = 1;
+        for (int lx = x - 1; lx >= 0 && layout[y][lx] == 0 && layout[y + 1][lx] == 1; lx--)
+            width++;
+        for (int rx = x + 1; rx < layout[y].Length && layout[y][rx] == 0 && layout[y + 1][rx] == 1; rx++)
+            width++;
+        return width;
     }
 }

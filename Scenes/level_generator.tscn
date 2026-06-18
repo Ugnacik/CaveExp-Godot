@@ -40,7 +40,6 @@ collision_visibility_mode = 1
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1500489240]
 position = Vector2(258, 304)
 offset = Vector2(100, -100.316)
-enabled = false
 
 [node name="EntranceSprite" type="Sprite2D" parent="." unique_id=1799795524]
 texture = ExtResource("4_mqkeq")
