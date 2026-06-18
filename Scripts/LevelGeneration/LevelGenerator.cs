@@ -22,6 +22,9 @@ public partial class LevelGenerator : Node2D
     private RoomData selectedEntranceRoom;
     private RoomData selectedExitRoom;
 
+    private Vector2I selectedEntranceMarkerShift;
+    private Vector2I selectedExitMarkerShift;
+
     // Door position cache: stores where doors were actually placed for each room
     private Dictionary<Vector2I, Dictionary<Direction, int>> _doorPositions = new();
 
@@ -185,6 +188,7 @@ public partial class LevelGenerator : Node2D
         // --- Place rooms with dynamic door alignment ---
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
         {
+
             for (int x = 0; x < Constants.GRID_WIDTH; x++)
             {
                 Direction[] needed = connections[x, y].ToArray();
@@ -197,24 +201,46 @@ public partial class LevelGenerator : Node2D
                     room = entranceRooms.FirstOrDefault(r =>
                         r.connections.Length == needed.Length &&
                         needed.All(c => r.connections.Contains(c)));
+
+                    if (room == null)
+                    {
+                        GD.PrintErr($"No entrance template for [{string.Join(", ", needed)}] at ({x},{y}). Using closed entrance room.");
+                        room = entranceRooms.FirstOrDefault(r => r.connections.Length == 0);
+                    }
+
                     selectedEntranceRoom = room;
+                    GD.Print($"Entrance tile ({x},{y}) needs [{string.Join(",", needed)}] -> picked '{room.name}'");
                 }
                 else if (isExit)
                 {
                     room = exitRooms.FirstOrDefault(r =>
                         r.connections.Length == needed.Length &&
                         needed.All(c => r.connections.Contains(c)));
+
+                    if (room == null)
+                    {
+                        GD.PrintErr($"No exit template for [{string.Join(", ", needed)}] at ({x},{y}). Using closed exit room.");
+                        room = exitRooms.FirstOrDefault(r => r.connections.Length == 1 && r.connections.Contains(Direction.Top));
+                    }
+
                     selectedExitRoom = room;
+                    GD.Print($"Exit tile ({x},{y}) needs [{string.Join(",", needed)}] -> picked '{room.name}'");
                 }
                 else
                 {
                     room = GetRoomByConnections(needed);
+
+                    if (room == null)
+                    {
+                        GD.PrintErr($"No standard template for [{string.Join(", ", needed)}] at ({x},{y}). Using closed room.");
+                        room = GetRoomByConnections(Array.Empty<Direction>());
+                    }
                 }
 
                 if (room == null)
                 {
-                    GD.PrintErr($"No template for [{string.Join(", ", needed)}] at ({x},{y}). Using closed room.");
-                    room = GetRoomByConnections(Array.Empty<Direction>());
+                    GD.PrintErr($"No closed-room fallback available at ({x},{y}). Skipping room placement.");
+                    continue;
                 }
 
                 // Calculate door offsets so openings align between adjacent rooms
@@ -222,7 +248,10 @@ public partial class LevelGenerator : Node2D
                 _doorPositions[new Vector2I(x, y)] = doorOffsets;
 
                 // Shift the layout so doors line up with neighbors
-                int[][] shiftedLayout = ShiftLayoutForDoors(room.layout, doorOffsets);
+                int[][] shiftedLayout = ShiftLayoutForDoors(room.layout, doorOffsets, out int shiftX, out int shiftY);
+
+                if (isEntrance) selectedEntranceMarkerShift = new Vector2I(shiftX, shiftY);
+                if (isExit) selectedExitMarkerShift = new Vector2I(shiftX, shiftY);
 
                 Vector2I offset = new Vector2I(
                     x * (Constants.ROOM_WIDTH - 1),
@@ -344,38 +373,35 @@ public partial class LevelGenerator : Node2D
     /// Creates a copy of the layout with rows/columns cyclically shifted
     /// so that door openings align with the target positions.
     /// Only shifts the axis relevant to each direction.
-    /// </summary>
-    private int[][] ShiftLayoutForDoors(int[][] original, Dictionary<Direction, int> doorOffsets)
+    private int[][] ShiftLayoutForDoors(int[][] original, Dictionary<Direction, int> doorOffsets, out int shiftX, out int shiftY)
     {
+        shiftX = 0;
+        shiftY = 0;
+
         int height = original.Length;
         int width = original[0].Length;
         int[][] result = new int[height][];
 
-        // Deep copy
         for (int y = 0; y < height; y++)
             result[y] = (int[])original[y].Clone();
 
-        // Horizontal shift for Top/Bottom doors
         if (doorOffsets.TryGetValue(Direction.Top, out int topTarget) ||
             doorOffsets.TryGetValue(Direction.Bottom, out _))
         {
             int targetX = doorOffsets.ContainsKey(Direction.Top) ? topTarget : doorOffsets[Direction.Bottom];
-
-            // Find current center opening on top row as reference
             int currentCenter = width / 2;
-            int shift = targetX - currentCenter;
+            shiftX = targetX - currentCenter;
 
-            if (shift != 0)
+            if (shiftX != 0)
             {
-                for (int y = 1; y < height - 1; y++) // Skip border rows
+                for (int y = 1; y < height - 1; y++)
                 {
                     int[] newRow = new int[width];
                     for (int x = 0; x < width; x++)
                     {
-                        int srcX = ((x - shift) % width + width) % width;
+                        int srcX = ((x - shiftX) % width + width) % width;
                         newRow[x] = result[y][srcX];
                     }
-                    // Preserve solid side walls
                     newRow[0] = 1;
                     newRow[width - 1] = 1;
                     result[y] = newRow;
@@ -383,33 +409,15 @@ public partial class LevelGenerator : Node2D
             }
         }
 
-        // Vertical shift for Left/Right doors
         if (doorOffsets.TryGetValue(Direction.Left, out int leftTarget) ||
             doorOffsets.TryGetValue(Direction.Right, out _))
         {
             int targetY = doorOffsets.ContainsKey(Direction.Left) ? leftTarget : doorOffsets[Direction.Right];
-
             int currentCenter = height / 2;
-            int shift = targetY - currentCenter;
+            shiftY = targetY - currentCenter;
 
-            if (shift != 0)
+            if (shiftY != 0)
             {
-                for (int x = 1; x < width - 1; x++) // Skip border columns
-                {
-                    for (int y = 0; y < height; y++)
-                    {
-                        int srcY = ((y - shift) % height + height) % height;
-                        // Only apply vertical shift to interior columns
-                        if (x > 0 && x < width - 1)
-                        {
-                            int tempVal = result[srcY][x];
-                            // We need a temporary buffer since we're modifying in-place
-                            // Use a separate pass instead
-                        }
-                    }
-                }
-
-                // Proper vertical shift with buffer
                 int[][] vertBuffer = new int[height][];
                 for (int y = 0; y < height; y++)
                     vertBuffer[y] = new int[width];
@@ -418,19 +426,17 @@ public partial class LevelGenerator : Node2D
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        int srcY = ((y - shift) % height + height) % height;
+                        int srcY = ((y - shiftY) % height + height) % height;
                         vertBuffer[y][x] = result[srcY][x];
                     }
                 }
 
-                // Merge back, preserving top/bottom borders
                 for (int y = 1; y < height - 1; y++)
                     for (int x = 1; x < width - 1; x++)
                         result[y][x] = vertBuffer[y][x];
             }
         }
 
-        // Ensure door cells are actually open after shifting
         foreach (var kvp in doorOffsets)
         {
             switch (kvp.Key)
@@ -463,8 +469,8 @@ public partial class LevelGenerator : Node2D
 
         var playerInstance = PlayerScene.Instantiate<Node2D>();
 
-        int tileX = entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0];
-        int tileY = entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1];
+        int tileX = entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0] + selectedEntranceMarkerShift.X;
+        int tileY = entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1] + selectedEntranceMarkerShift.Y;
 
         Vector2 worldPos = dirtLayer.MapToLocal(new Vector2I(tileX, tileY));
         playerInstance.GlobalPosition = worldPos + dirtLayer.GlobalPosition;
@@ -483,8 +489,8 @@ public partial class LevelGenerator : Node2D
         Vector2I entranceTile;
         if (selectedEntranceRoom?.markerPos != null)
             entranceTile = new Vector2I(
-                entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0],
-                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1]);
+                entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0] + selectedEntranceMarkerShift.X,
+                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1] + selectedEntranceMarkerShift.Y);
         else
             entranceTile = new Vector2I(
                 entranceRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
@@ -495,8 +501,8 @@ public partial class LevelGenerator : Node2D
         Vector2I exitTile;
         if (selectedExitRoom?.markerPos != null)
             exitTile = new Vector2I(
-                exitRoom.X * (Constants.ROOM_WIDTH - 1) + selectedExitRoom.markerPos[0],
-                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedExitRoom.markerPos[1]);
+                exitRoom.X * (Constants.ROOM_WIDTH - 1) + selectedExitRoom.markerPos[0] + selectedExitMarkerShift.X,
+                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedExitRoom.markerPos[1] + selectedExitMarkerShift.Y);
         else
             exitTile = new Vector2I(
                 exitRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
