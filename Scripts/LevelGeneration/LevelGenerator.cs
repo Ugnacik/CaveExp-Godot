@@ -6,55 +6,53 @@ using System.Collections.Generic;
 public partial class LevelGenerator : Node2D
 {
     [Export] public PackedScene PlayerScene;
-    TileMapLayer dirtLayer;
-    TileMapLayer spikeLayer;
-    Sprite2D entranceSprite;
-    Sprite2D exitSprite;
 
+    private TileMapLayer dirtLayer;
+    private TileMapLayer spikeLayer;
+    private Sprite2D entranceSprite;
+    private Sprite2D exitSprite;
     private Random rng = new Random();
+
     private List<RoomData> entranceRooms;
     private List<RoomData> exitRooms;
     private List<RoomData> standardRooms;
+
     private Vector2I entranceRoom;
     private Vector2I exitRoom;
     private RoomData selectedEntranceRoom;
     private RoomData selectedExitRoom;
 
+    // Door position cache: stores where doors were actually placed for each room
+    private Dictionary<Vector2I, Dictionary<Direction, int>> _doorPositions = new();
+
     public override void _Ready()
     {
         dirtLayer = GetNode<TileMapLayer>("Dirt");
         spikeLayer = GetNode<TileMapLayer>("Spikes");
-
         entranceSprite = GetNode<Sprite2D>("EntranceSprite");
         exitSprite = GetNode<Sprite2D>("ExitSprite");
 
         entranceRooms = RoomLoader.Load("res://Scenes/Rooms/entrance_rooms.json");
         exitRooms = RoomLoader.Load("res://Scenes/Rooms/exit_rooms.json");
         standardRooms = RoomLoader.Load("res://Scenes/Rooms/rooms.json");
+
         GD.Print($"Entrance rooms: {entranceRooms.Count}, Exit rooms: {exitRooms.Count}, Standard rooms: {standardRooms.Count}");
 
-        // Set up entity container (create an empty Node2D called "Entities" in your scene tree)
         TilePlacer.EntityContainer = GetNode("Entities");
-
         TilePlacer.SpawnerPool = new Dictionary<int, List<PackedScene>>
         {
-            [3] = new List<PackedScene>
-            {
-                GD.Load<PackedScene>("res://Scenes/Entities/bat.tscn")
-            },
-            [4] = new List<PackedScene>
-            {
-                GD.Load<PackedScene>("res://Scenes/Entities/snake.tscn")
-            }
+            [3] = new List<PackedScene> { GD.Load<PackedScene>("res://Scenes/Entities/bat.tscn") },
+            [4] = new List<PackedScene> { GD.Load<PackedScene>("res://Scenes/Entities/snake.tscn") }
         };
 
         GenerateLevel();
     }
 
-    void GenerateLevel()
+    private void GenerateLevel()
     {
         dirtLayer.Clear();
         TilePlacer.ClearSpawnedPositions();
+        _doorPositions.Clear();
 
         var connections = new HashSet<Direction>[Constants.GRID_WIDTH, Constants.GRID_HEIGHT];
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
@@ -67,7 +65,6 @@ public partial class LevelGenerator : Node2D
 
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
         {
-            // Increased to 90% to naturally reduce straight drops
             bool snake = rng.Next(10) < 9;
             if (y == 0) snake = true;
 
@@ -95,13 +92,13 @@ public partial class LevelGenerator : Node2D
 
             if (y < Constants.GRID_HEIGHT - 1)
             {
-                // BETTER IDEA: Prevent solution path from creating consecutive drops
                 if (connections[col, y].Contains(Direction.Top))
                 {
-                    // Force at least one horizontal step to offset the drop
                     int dir = (col == 0) ? 1 : (col == Constants.GRID_WIDTH - 1 ? -1 : (rng.Next(2) == 0 ? -1 : 1));
                     int nextCol = col + dir;
-                    AddConnection(connections, col, y, nextCol, y, dir == 1 ? Direction.Right : Direction.Left, dir == 1 ? Direction.Left : Direction.Right);
+                    AddConnection(connections, col, y, nextCol, y,
+                        dir == 1 ? Direction.Right : Direction.Left,
+                        dir == 1 ? Direction.Left : Direction.Right);
                     col = nextCol;
                 }
                 AddConnection(connections, col, y, col, y + 1, Direction.Bottom, Direction.Top);
@@ -111,22 +108,18 @@ public partial class LevelGenerator : Node2D
         exitRoom = new Vector2I(col, Constants.GRID_HEIGHT - 1);
         GD.Print($"Entrance: {entranceRoom}, Exit: {exitRoom}");
 
-        // --- Count vertical drops per column from solution path ---
+        // --- Count vertical drops per column ---
         int[] verticalDropsInColumn = new int[Constants.GRID_WIDTH];
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
             for (int x = 0; x < Constants.GRID_WIDTH; x++)
                 if (connections[x, y].Contains(Direction.Bottom))
                     verticalDropsInColumn[x]++;
 
-        // --- Decide upfront how many off-path drops each column gets ---
+        // --- Off-path drop budget ---
         int[] offPathDropsAllowed = new int[Constants.GRID_WIDTH];
         for (int x = 0; x < Constants.GRID_WIDTH; x++)
         {
-            if (verticalDropsInColumn[x] >= 1)
-            {
-                offPathDropsAllowed[x] = 0;
-                continue;
-            }
+            if (verticalDropsInColumn[x] >= 1) { offPathDropsAllowed[x] = 0; continue; }
 
             int roll = rng.Next(100);
             if (roll < 88) offPathDropsAllowed[x] = 0;
@@ -175,13 +168,12 @@ public partial class LevelGenerator : Node2D
                 else if (canGoRight)
                     AddConnection(connections, x, y, x + 1, y, Direction.Right, Direction.Left);
 
-                // Vertical — consume from the per-column budget
                 bool hasTop = connections[x, y].Contains(Direction.Top);
                 if (y < Constants.GRID_HEIGHT - 1
-                     && !connections[x, y + 1].Contains(Direction.Top)
-                     && offPathDropsAllowed[x] > 0
-                     && rng.Next(6) == 0
-                     && !hasTop) // BETTER IDEA: Never add Bottom if we already have Top
+                    && !connections[x, y + 1].Contains(Direction.Top)
+                    && offPathDropsAllowed[x] > 0
+                    && rng.Next(6) == 0
+                    && !hasTop)
                 {
                     AddConnection(connections, x, y, x, y + 1, Direction.Bottom, Direction.Top);
                     offPathDropsAllowed[x]--;
@@ -190,7 +182,7 @@ public partial class LevelGenerator : Node2D
             }
         }
 
-        // --- Place rooms ---
+        // --- Place rooms with dynamic door alignment ---
         for (int y = 0; y < Constants.GRID_HEIGHT; y++)
         {
             for (int x = 0; x < Constants.GRID_WIDTH; x++)
@@ -225,17 +217,22 @@ public partial class LevelGenerator : Node2D
                     room = GetRoomByConnections(Array.Empty<Direction>());
                 }
 
+                // Calculate door offsets so openings align between adjacent rooms
+                var doorOffsets = CalculateDoorOffsets(room, needed, x, y, connections);
+                _doorPositions[new Vector2I(x, y)] = doorOffsets;
+
+                // Shift the layout so doors line up with neighbors
+                int[][] shiftedLayout = ShiftLayoutForDoors(room.layout, doorOffsets);
+
                 Vector2I offset = new Vector2I(
                     x * (Constants.ROOM_WIDTH - 1),
                     y * (Constants.ROOM_HEIGHT - 1)
                 );
 
-                // Determine allowed spawns based on room type
                 SpawnFlags allowedSpawns = SpawnFlags.All;
-                if (isEntrance)
-                    allowedSpawns = SpawnFlags.None; // Only entrance is completely safe
+                if (isEntrance) allowedSpawns = SpawnFlags.None;
 
-                TilePlacer.PlaceRoom(room.layout, offset, dirtLayer, spikeLayer, rng, allowedSpawns);
+                TilePlacer.PlaceRoom(shiftedLayout, offset, dirtLayer, spikeLayer, rng, allowedSpawns);
             }
         }
 
@@ -244,46 +241,254 @@ public partial class LevelGenerator : Node2D
 
         GD.Print($"Level generated. Entrance: {entranceRoom}, Exit: {exitRoom}");
     }
-    void SpawnPlayer()
+
+    /// For each required connection direction, find where the neighbor's door is
+    /// and record that position so this room's door can be shifted to match.
+    private Dictionary<Direction, int> CalculateDoorOffsets(
+            RoomData room, Direction[] needed, int x, int y,
+            HashSet<Direction>[,] connections)
+        {
+            var offsets = new Dictionary<Direction, int>();
+
+            foreach (var dir in needed)
+            {
+                int targetPos = GetDefaultDoorPosition(dir);
+
+                // If the neighbor already exists and has a recorded door position, match it
+                Vector2I neighbor = dir switch
+                {
+                    Direction.Top => new Vector2I(x, y - 1),
+                    Direction.Bottom => new Vector2I(x, y + 1),
+                    Direction.Left => new Vector2I(x - 1, y),
+                    Direction.Right => new Vector2I(x + 1, y),
+                    _ => new Vector2I(x, y)
+                };
+
+                Direction oppositeDir = dir switch
+                {
+                    Direction.Top => Direction.Bottom,
+                    Direction.Bottom => Direction.Top,
+                    Direction.Left => Direction.Right,
+                    Direction.Right => Direction.Left,
+                    _ => dir
+                };
+
+                if (_doorPositions.TryGetValue(neighbor, out var neighborDoors)
+                    && neighborDoors.TryGetValue(oppositeDir, out int neighborDoorPos))
+                {
+                    targetPos = neighborDoorPos;
+                }
+                else
+                {
+                    // Neighbor not yet placed: pick a random valid door position on this edge
+                    targetPos = PickRandomDoorPosition(room.layout, dir);
+                }
+
+                offsets[dir] = targetPos;
+            }
+
+            return offsets;
+        }
+
+
+    /// Returns the default center-door position for a given edge.
+    /// Horizontal edges use X center, vertical edges use Y center.
+    /// </summary>
+    private int GetDefaultDoorPosition(Direction dir)
+    {
+        return dir switch
+        {
+            Direction.Top or Direction.Bottom => Constants.ROOM_WIDTH / 2,
+            Direction.Left or Direction.Right => Constants.ROOM_HEIGHT / 2,
+            _ => 0
+        };
+    }
+
+
+    /// Scans the room layout for existing openings on the specified edge
+    /// and returns one at random. Falls back to center if none found.
+    /// </summary>
+    private int PickRandomDoorPosition(int[][] layout, Direction dir)
+    {
+        var validPositions = new List<int>();
+
+        switch (dir)
+        {
+            case Direction.Top:
+                for (int x = 0; x < layout[0].Length; x++)
+                    if (layout[0][x] == 0) validPositions.Add(x);
+                break;
+            case Direction.Bottom:
+                int bottomRow = layout.Length - 1;
+                for (int x = 0; x < layout[bottomRow].Length; x++)
+                    if (layout[bottomRow][x] == 0) validPositions.Add(x);
+                break;
+            case Direction.Left:
+                for (int y = 0; y < layout.Length; y++)
+                    if (layout[y][0] == 0) validPositions.Add(y);
+                break;
+            case Direction.Right:
+                int rightCol = layout[0].Length - 1;
+                for (int y = 0; y < layout.Length; y++)
+                    if (layout[y][rightCol] == 0) validPositions.Add(y);
+                break;
+        }
+
+        if (validPositions.Count == 0)
+            return GetDefaultDoorPosition(dir);
+
+        return validPositions[rng.Next(validPositions.Count)];
+    }
+
+
+    /// Creates a copy of the layout with rows/columns cyclically shifted
+    /// so that door openings align with the target positions.
+    /// Only shifts the axis relevant to each direction.
+    /// </summary>
+    private int[][] ShiftLayoutForDoors(int[][] original, Dictionary<Direction, int> doorOffsets)
+    {
+        int height = original.Length;
+        int width = original[0].Length;
+        int[][] result = new int[height][];
+
+        // Deep copy
+        for (int y = 0; y < height; y++)
+            result[y] = (int[])original[y].Clone();
+
+        // Horizontal shift for Top/Bottom doors
+        if (doorOffsets.TryGetValue(Direction.Top, out int topTarget) ||
+            doorOffsets.TryGetValue(Direction.Bottom, out _))
+        {
+            int targetX = doorOffsets.ContainsKey(Direction.Top) ? topTarget : doorOffsets[Direction.Bottom];
+
+            // Find current center opening on top row as reference
+            int currentCenter = width / 2;
+            int shift = targetX - currentCenter;
+
+            if (shift != 0)
+            {
+                for (int y = 1; y < height - 1; y++) // Skip border rows
+                {
+                    int[] newRow = new int[width];
+                    for (int x = 0; x < width; x++)
+                    {
+                        int srcX = ((x - shift) % width + width) % width;
+                        newRow[x] = result[y][srcX];
+                    }
+                    // Preserve solid side walls
+                    newRow[0] = 1;
+                    newRow[width - 1] = 1;
+                    result[y] = newRow;
+                }
+            }
+        }
+
+        // Vertical shift for Left/Right doors
+        if (doorOffsets.TryGetValue(Direction.Left, out int leftTarget) ||
+            doorOffsets.TryGetValue(Direction.Right, out _))
+        {
+            int targetY = doorOffsets.ContainsKey(Direction.Left) ? leftTarget : doorOffsets[Direction.Right];
+
+            int currentCenter = height / 2;
+            int shift = targetY - currentCenter;
+
+            if (shift != 0)
+            {
+                for (int x = 1; x < width - 1; x++) // Skip border columns
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        int srcY = ((y - shift) % height + height) % height;
+                        // Only apply vertical shift to interior columns
+                        if (x > 0 && x < width - 1)
+                        {
+                            int tempVal = result[srcY][x];
+                            // We need a temporary buffer since we're modifying in-place
+                            // Use a separate pass instead
+                        }
+                    }
+                }
+
+                // Proper vertical shift with buffer
+                int[][] vertBuffer = new int[height][];
+                for (int y = 0; y < height; y++)
+                    vertBuffer[y] = new int[width];
+
+                for (int x = 1; x < width - 1; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        int srcY = ((y - shift) % height + height) % height;
+                        vertBuffer[y][x] = result[srcY][x];
+                    }
+                }
+
+                // Merge back, preserving top/bottom borders
+                for (int y = 1; y < height - 1; y++)
+                    for (int x = 1; x < width - 1; x++)
+                        result[y][x] = vertBuffer[y][x];
+            }
+        }
+
+        // Ensure door cells are actually open after shifting
+        foreach (var kvp in doorOffsets)
+        {
+            switch (kvp.Key)
+            {
+                case Direction.Top:
+                    result[0][kvp.Value] = 0;
+                    if (kvp.Value + 1 < width) result[0][kvp.Value + 1] = 0;
+                    break;
+                case Direction.Bottom:
+                    result[height - 1][kvp.Value] = 0;
+                    if (kvp.Value + 1 < width) result[height - 1][kvp.Value + 1] = 0;
+                    break;
+                case Direction.Left:
+                    result[kvp.Value][0] = 0;
+                    if (kvp.Value + 1 < height) result[kvp.Value + 1][0] = 0;
+                    break;
+                case Direction.Right:
+                    result[kvp.Value][width - 1] = 0;
+                    if (kvp.Value + 1 < height) result[kvp.Value + 1][width - 1] = 0;
+                    break;
+            }
+        }
+
+        return result;
+    }
+
+    private void SpawnPlayer()
     {
         if (PlayerScene == null || selectedEntranceRoom == null) return;
 
         var playerInstance = PlayerScene.Instantiate<Node2D>();
 
-        // Calculate world position from tile coordinates
-        // markerPos is in tiles, so we multiply by tile size (assuming 16x16)
         int tileX = entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0];
         int tileY = entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1];
 
-        // MapToLocal converts tile coords to local space of the TileMapLayer
         Vector2 worldPos = dirtLayer.MapToLocal(new Vector2I(tileX, tileY));
-
-        // Add the layer's global position to get true world space
         playerInstance.GlobalPosition = worldPos + dirtLayer.GlobalPosition;
 
         AddChild(playerInstance);
         GD.Print($"Player spawned at {playerInstance.GlobalPosition}");
     }
-    void PlaceMarkers()
+
+    private void PlaceMarkers()
     {
         Vector2 offset = dirtLayer.Position;
 
-        if (selectedEntranceRoom == null)
-            GD.PrintErr("Missing entrance room data!");
-        if (selectedExitRoom == null)
-            GD.PrintErr("Missing exit room data!");
+        if (selectedEntranceRoom == null) GD.PrintErr("Missing entrance room data!");
+        if (selectedExitRoom == null) GD.PrintErr("Missing exit room data!");
 
         Vector2I entranceTile;
         if (selectedEntranceRoom?.markerPos != null)
             entranceTile = new Vector2I(
                 entranceRoom.X * (Constants.ROOM_WIDTH - 1) + selectedEntranceRoom.markerPos[0],
-                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1]
-            );
+                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedEntranceRoom.markerPos[1]);
         else
             entranceTile = new Vector2I(
                 entranceRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
-                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + 1
-            );
+                entranceRoom.Y * (Constants.ROOM_HEIGHT - 1) + 1);
 
         entranceSprite.Position = dirtLayer.MapToLocal(entranceTile) + offset;
 
@@ -291,37 +496,31 @@ public partial class LevelGenerator : Node2D
         if (selectedExitRoom?.markerPos != null)
             exitTile = new Vector2I(
                 exitRoom.X * (Constants.ROOM_WIDTH - 1) + selectedExitRoom.markerPos[0],
-                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedExitRoom.markerPos[1]
-            );
+                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + selectedExitRoom.markerPos[1]);
         else
             exitTile = new Vector2I(
                 exitRoom.X * (Constants.ROOM_WIDTH - 1) + Constants.ROOM_WIDTH / 2,
-                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + 1
-            );
+                exitRoom.Y * (Constants.ROOM_HEIGHT - 1) + 1);
 
         exitSprite.Position = dirtLayer.MapToLocal(exitTile) + offset;
     }
 
-    void AddConnection(
+    private void AddConnection(
         HashSet<Direction>[,] connections,
-        int ax, int ay,
-        int bx, int by,
-        Direction aDir,
-        Direction bDir)
+        int ax, int ay, int bx, int by,
+        Direction aDir, Direction bDir)
     {
         connections[ax, ay].Add(aDir);
         connections[bx, by].Add(bDir);
     }
 
-    RoomData GetRoomByConnections(params Direction[] requiredConnections)
+    private RoomData GetRoomByConnections(params Direction[] requiredConnections)
     {
         var matchingRooms = standardRooms.Where(room =>
             room.connections.Length == requiredConnections.Length &&
-            requiredConnections.All(connection => room.connections.Contains(connection))).ToList();
+            requiredConnections.All(c => room.connections.Contains(c))).ToList();
 
         if (matchingRooms.Count == 0) return null;
-
-        // Pick a random template from the valid ones
         return matchingRooms[rng.Next(matchingRooms.Count)];
     }
 }
