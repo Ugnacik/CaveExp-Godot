@@ -1,5 +1,5 @@
 # Názov hry
-**CaveExp** (Pracovný názov)
+**CaveExp**
 
 # Žáner
 Rogue-like / 2D Akčný platformer
