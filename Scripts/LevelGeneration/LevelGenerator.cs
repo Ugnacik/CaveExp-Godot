@@ -529,4 +529,19 @@ public partial class LevelGenerator : Node2D
         if (matchingRooms.Count == 0) return null;
         return matchingRooms[rng.Next(matchingRooms.Count)];
     }
+
+    private void _on_exit_body_entered(Node2D body)
+    {
+        // Verify it's the player using a group check (cleaner than type checking)
+        if (!body.IsInGroup("player")) return;
+
+        GD.Print("Exit reached! Reloading level...");
+
+        // Disable the exit immediately to prevent double-triggering during transition
+        var exitArea = GetNode<Area2D>("ExitSprite/Area2D");
+        exitArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
+
+        // Reload the current scene
+        GetTree().ReloadCurrentScene();
+    }
 }

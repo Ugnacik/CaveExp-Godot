@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://b5v65hg1oudxs" path="res://Sprites/Level/Tiles/Entrance_Exit/entrance_0.png" id="4_mqkeq"]
 [ext_resource type="Texture2D" uid="uid://dx1p2ru22timq" path="res://Sprites/Level/Tiles/Entrance_Exit/exit_0.png" id="5_h1mju"]
 [ext_resource type="PackedScene" uid="uid://co8uxoa87vn0l" path="res://Scenes/pause_menu.tscn" id="7_kp8js"]
+[ext_resource type="Script" uid="uid://dnyqrlaeuu4ty" path="res://Scripts/LevelGeneration/ExitTrigger.cs" id="7_x4guj"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_h1mju"]
 texture = ExtResource("2_m4suv")
@@ -25,6 +26,9 @@ texture = ExtResource("2_m4suv")
 physics_layer_0/collision_layer = 1
 sources/11 = SubResource("TileSetAtlasSource_h1mju")
 tile_proxies/coords_level = [[1, Vector2i(0, 0)], [11, Vector2i(0, 0)], [7, Vector2i(0, 0)], [11, Vector2i(1, 0)], [8, Vector2i(0, 0)], [11, Vector2i(2, 0)], [9, Vector2i(0, 0)], [11, Vector2i(3, 0)], [10, Vector2i(0, 0)], [11, Vector2i(4, 0)]]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bfltv"]
+size = Vector2(16, 16)
 
 [node name="LevelGenerator" type="Node2D" unique_id=1157705696]
 script = ExtResource("1_b1ki7")
@@ -49,8 +53,16 @@ texture = ExtResource("4_mqkeq")
 [node name="ExitSprite" type="Sprite2D" parent="." unique_id=982826132]
 texture = ExtResource("5_h1mju")
 
+[node name="Area2D" type="Area2D" parent="ExitSprite" unique_id=1133367805]
+script = ExtResource("7_x4guj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitSprite/Area2D" unique_id=1160879955]
+shape = SubResource("RectangleShape2D_bfltv")
+
 [node name="Entities" type="Node2D" parent="." unique_id=354114495]
 
 [node name="PauseMenu" parent="." unique_id=641316087 instance=ExtResource("7_kp8js")]
 process_mode = 3
 visible = false
+
+[connection signal="body_entered" from="ExitSprite/Area2D" to="." method="_on_exit_body_entered"]

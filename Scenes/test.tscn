@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://2lt8w6e088cd"]
 
-[ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://CaveExp-Godot/Scenes/Entities/player.tscn" id="1_hvoek"]
-[ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://CaveExp-Godot/Sprites/Level/TileSets/Dirt.png" id="2_i7iy8"]
-[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://CaveExp-Godot/Scenes/DamageObjects/spikes.tscn" id="3_fsfgi"]
-[ext_resource type="PackedScene" uid="uid://bgkahg6w7pl7j" path="res://CaveExp-Godot/Scenes/Entities/bat.tscn" id="4_fn5wv"]
-[ext_resource type="Script" uid="uid://deka6i6iwy6mq" path="res://CaveExp-Godot/Scenes/Node2d.cs" id="5_bu3ir"]
+[ext_resource type="PackedScene" uid="uid://cl8jf1j7kmch4" path="res://Scenes/Entities/player.tscn" id="1_hvoek"]
+[ext_resource type="Texture2D" uid="uid://dttqbbn6w8w77" path="res://Sprites/Level/TileSets/Dirt.png" id="2_i7iy8"]
+[ext_resource type="PackedScene" uid="uid://cemkxbl7dkkeq" path="res://Scenes/DamageObjects/spikes.tscn" id="3_fsfgi"]
+[ext_resource type="Texture2D" uid="uid://dx1p2ru22timq" path="res://Sprites/Level/Tiles/Entrance_Exit/exit_0.png" id="4_35xla"]
+[ext_resource type="Script" uid="uid://dnyqrlaeuu4ty" path="res://Scripts/LevelGeneration/ExitTrigger.cs" id="5_i3aeo"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
 texture = ExtResource("2_i7iy8")
@@ -24,9 +24,12 @@ physics_layer_0/collision_layer = 1
 sources/11 = SubResource("TileSetAtlasSource_bo1nx")
 tile_proxies/coords_level = [[1, Vector2i(0, 0)], [11, Vector2i(0, 0)], [7, Vector2i(0, 0)], [11, Vector2i(1, 0)], [8, Vector2i(0, 0)], [11, Vector2i(2, 0)], [9, Vector2i(0, 0)], [11, Vector2i(3, 0)], [10, Vector2i(0, 0)], [11, Vector2i(4, 0)]]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5wyu1"]
+size = Vector2(16, 16)
+
 [node name="Main" type="Node" unique_id=1370022438]
 
-[node name="Player" parent="." unique_id=1088978412 instance=ExtResource("1_hvoek")]
+[node name="Player" parent="." unique_id=1088978412 groups=["player"] instance=ExtResource("1_hvoek")]
 position = Vector2(-66, -3)
 
 [node name="Dirt" type="TileMapLayer" parent="." unique_id=825281796]
@@ -41,8 +44,15 @@ collision_visibility_mode = 1
 position = Vector2(1, 0)
 tile_map_data = PackedByteArray("AADu/wEAAAAAAAAAAAA=")
 
-[node name="Bat" parent="." unique_id=357385223 instance=ExtResource("4_fn5wv")]
-position = Vector2(75, -98)
-
 [node name="LevelGenerator" type="Node2D" parent="." unique_id=1363672773]
-script = ExtResource("5_bu3ir")
+
+[node name="ExitSprite" type="Sprite2D" parent="." unique_id=1618810072]
+texture = ExtResource("4_35xla")
+
+[node name="Area2D" type="Area2D" parent="ExitSprite" unique_id=861150259]
+script = ExtResource("5_i3aeo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitSprite/Area2D" unique_id=261724674]
+shape = SubResource("RectangleShape2D_5wyu1")
+
+[connection signal="body_entered" from="ExitSprite/Area2D" to="ExitSprite/Area2D" method="OnBodyEntered"]

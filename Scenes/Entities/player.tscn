@@ -32,7 +32,7 @@ size = Vector2(28, 42)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnns0"]
 height = 40.0
 
-[node name="Player" type="CharacterBody2D" unique_id=1088978412]
+[node name="Player" type="CharacterBody2D" unique_id=1088978412 groups=["player"]]
 scale = Vector2(0.3, 0.3)
 collision_layer = 9
 script = ExtResource("1_82m87")
