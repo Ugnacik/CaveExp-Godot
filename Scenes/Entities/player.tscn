@@ -10,7 +10,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("1_r6ure")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Player_Idle",
 "speed": 5.0
 }, {
@@ -21,7 +21,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("3_82m87")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Player_Run",
 "speed": 5.0
 }]
@@ -33,7 +33,7 @@ size = Vector2(28, 42)
 height = 40.0
 
 [node name="Player" type="CharacterBody2D" unique_id=1088978412]
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.3, 0.3)
 collision_layer = 9
 script = ExtResource("1_82m87")
 Speed = 300

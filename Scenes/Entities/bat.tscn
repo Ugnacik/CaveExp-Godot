@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bgkahg6w7pl7j"]
 
-[ext_resource type="Texture2D" uid="uid://b2qhaigdpnmjn" path="res://CaveExp-Godot/Sprites/Enemies/Bat/Fly.png" id="1_n2xlw"]
-[ext_resource type="Script" uid="uid://ds7jj8s4lfcib" path="res://CaveExp-Godot/Scripts/Enemies/Bat.cs" id="1_sgcmh"]
-[ext_resource type="Texture2D" uid="uid://bwg1y01aubrc0" path="res://CaveExp-Godot/Sprites/Enemies/Bat/Hang.png" id="2_sgcmh"]
+[ext_resource type="Texture2D" uid="uid://b2qhaigdpnmjn" path="res://Sprites/Enemies/Bat/Fly.png" id="1_n2xlw"]
+[ext_resource type="Script" uid="uid://ds7jj8s4lfcib" path="res://Scripts/Enemies/Bat.cs" id="1_sgcmh"]
+[ext_resource type="Texture2D" uid="uid://bwg1y01aubrc0" path="res://Sprites/Enemies/Bat/Hang.png" id="2_sgcmh"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gq56m"]
 atlas = ExtResource("1_n2xlw")
@@ -28,7 +28,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_at6g3")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Fly",
 "speed": 5.0
 }, {
@@ -36,7 +36,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("2_sgcmh")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Hang",
 "speed": 5.0
 }]
@@ -48,6 +48,7 @@ size = Vector2(11, 16)
 size = Vector2(128, 248)
 
 [node name="Bat" type="CharacterBody2D" unique_id=357385223]
+scale = Vector2(0.9, 0.9)
 script = ExtResource("1_sgcmh")
 FlySpeed = 100.0
 Acceleration = 250.0

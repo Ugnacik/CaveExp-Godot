@@ -5,3 +5,4 @@
 [node name="Main" type="Node" unique_id=1370022438]
 
 [node name="LevelGenerator" parent="." unique_id=1157705696 instance=ExtResource("3_iwedk")]
+position = Vector2(0, -1)
