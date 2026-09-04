@@ -62,4 +62,17 @@ position = Vector2(0.5, 0)
 shape = SubResource("CapsuleShape2D_lnns0")
 debug_color = Color(1, 0, 0, 0.41960785)
 
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="HealthLabel" type="Label" parent="HUD"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 180.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 28
+text = "HP: 4/4"
+
 [connection signal="body_entered" from="HitBox" to="." method="_on_hit_box_body_entered"]

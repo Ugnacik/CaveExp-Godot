@@ -10,12 +10,17 @@ public partial class Player : CharacterBody2D
     [Export] public int MaxHealth = 4;
     private int _currentHealth;
     private bool _isInvulnerable = false;
+    private bool _isDead = false;
     private float _invulTime = 0.6f;
     private float _invulTimer = 0f;
+    private float _hurtFlashTimer = 0f;
 
     //KnockBack
     [Export] public float KnockbackForceX = 250f;
     [Export] public float KnockbackForceY = -300f;
+    [Export] public float KnockbackDuration = 0.18f;
+    [Export] public float HurtFlashDuration = 0.15f;
+    private float _knockbackTimer = 0f;
 
     //Stomp
     [Export] public int StompDamage = 1;
@@ -36,14 +41,17 @@ public partial class Player : CharacterBody2D
     private float _HitBoxBaseX;
 
     private AnimatedSprite2D _animatedSprite;
+    private Label _healthLabel;
     public Vector2 ScreenSize;
 
     public override void _Ready()
     {
         ScreenSize = GetViewportRect().Size;
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+        _healthLabel = GetNode<Label>("HUD/HealthLabel");
         _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
         _currentHealth = MaxHealth;
+        UpdateHealthDisplay();
 
         _HitBox = GetNode<CollisionShape2D>("HitBox/CollisionShape2D");
         _HitBoxBaseX = _HitBox.Position.X;
@@ -72,7 +80,14 @@ public partial class Player : CharacterBody2D
 
         // 2️⃣ Horizontal movement
         float direction = Input.GetAxis("player_left", "player_right");
-        velocity.X = direction * Speed;
+        if (_knockbackTimer > 0)
+        {
+            _knockbackTimer -= (float)delta;
+        }
+        else
+        {
+            velocity.X = direction * Speed;
+        }
 
         // 3️⃣ Jump
         if (IsOnFloor() && Input.IsActionJustPressed("player_jump"))
@@ -80,9 +95,10 @@ public partial class Player : CharacterBody2D
             velocity.Y = JumpForce;
         }
 
+        bool wasDescending = velocity.Y >= 0;
         Velocity = velocity;
         MoveAndSlide();
-        HandleEnemyCollision();
+        HandleEnemyCollision(wasDescending);
 
         // 4️⃣ Animation
         SetAnimation(direction);
@@ -94,6 +110,16 @@ public partial class Player : CharacterBody2D
             if (_invulTimer <= 0)
             {
                 _isInvulnerable = false;
+                SetEnemyCollisionBypass(false);
+            }
+        }
+
+        if (_hurtFlashTimer > 0)
+        {
+            _hurtFlashTimer -= (float)delta;
+            if (_hurtFlashTimer <= 0)
+            {
+                _animatedSprite.Modulate = Colors.White;
             }
         }
 
@@ -101,10 +127,11 @@ public partial class Player : CharacterBody2D
 
     public void TakeDamage(int amount, Vector2 sourcePosition)
     {
-        if (_isInvulnerable)
+        if (_isInvulnerable || _isDead)
             return;
 
         _currentHealth -= amount;
+        UpdateHealthDisplay();
 
         GD.Print("Player HP: " + _currentHealth);
 
@@ -118,9 +145,13 @@ public partial class Player : CharacterBody2D
 
         _isInvulnerable = true;
         _invulTimer = _invulTime;
+        _knockbackTimer = KnockbackDuration;
+        _hurtFlashTimer = HurtFlashDuration;
+        _animatedSprite.Modulate = new Color(1f, 0.2f, 0.2f);
+        SetEnemyCollisionBypass(true);
     }
 
-    private void HandleEnemyCollision()
+    private void HandleEnemyCollision(bool wasDescending)
     {
         for (int i = 0; i < GetSlideCollisionCount(); i++)
         {
@@ -128,7 +159,7 @@ public partial class Player : CharacterBody2D
 
             if (collision.GetCollider() is Enemy enemy)
             {
-                if (TryStompEnemy(enemy, collision))
+                if (TryStompEnemy(enemy, collision, wasDescending))
                     return;
 
                 // Otherwise player takes damage
@@ -137,11 +168,12 @@ public partial class Player : CharacterBody2D
             }
         }
     }
-    private bool TryStompEnemy(Enemy enemy, KinematicCollision2D collision)
+    private bool TryStompEnemy(Enemy enemy, KinematicCollision2D collision, bool wasDescending)
     {
-        // If collision normal is pointing upward,
-        // it means we hit the enemy from above.
-        if (collision.GetNormal().Y < -0.7f)
+        bool hasTopFacingNormal = collision.GetNormal().Y < -0.35f;
+        bool playerCenterIsAbove = GlobalPosition.Y + StompTolerance < enemy.GlobalPosition.Y;
+
+        if (wasDescending && (hasTopFacingNormal || playerCenterIsAbove))
         {
             enemy.TakeDamage(StompDamage);
             BounceAfterStomp();
@@ -149,6 +181,11 @@ public partial class Player : CharacterBody2D
         }
 
         return false;
+    }
+
+    public bool IsDescendingOnto(Enemy enemy)
+    {
+        return Velocity.Y > 0 && GlobalPosition.Y + StompTolerance < enemy.GlobalPosition.Y;
     }
 
     private void BounceAfterStomp()
@@ -171,8 +208,38 @@ public partial class Player : CharacterBody2D
         );
     }
 
+    private void UpdateHealthDisplay()
+    {
+        if (_healthLabel != null)
+        {
+            _healthLabel.Text = $"HP: {Mathf.Max(_currentHealth, 0)}/{MaxHealth}";
+        }
+    }
+
+    private void SetEnemyCollisionBypass(bool enabled)
+    {
+        foreach (Node node in GetTree().GetNodesInGroup("enemies"))
+        {
+            if (node is not PhysicsBody2D enemy) continue;
+
+            if (enabled)
+            {
+                AddCollisionExceptionWith(enemy);
+                enemy.AddCollisionExceptionWith(this);
+            }
+            else
+            {
+                RemoveCollisionExceptionWith(enemy);
+                enemy.RemoveCollisionExceptionWith(this);
+            }
+        }
+    }
+
     private void Die()
     {
+        if (_isDead) return;
+        _isDead = true;
+
         GD.Print("Player Died");
 
         //QueueFree(); // or respawn logic later
@@ -208,7 +275,12 @@ public partial class Player : CharacterBody2D
 
     private void ReloadScene()
     {
-        GetTree().ReloadCurrentScene();
+        if (!IsInsideTree()) return;
+
+        var tree = GetTree();
+        if (tree?.CurrentScene == null) return;
+
+        tree.ReloadCurrentScene();
     }
 
 }

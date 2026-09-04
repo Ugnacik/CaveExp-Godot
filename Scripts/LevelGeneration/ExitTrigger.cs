@@ -24,13 +24,16 @@ public partial class ExitTrigger : Area2D
         SetDeferred(Area2D.PropertyName.Monitoring, false);
 
         GD.Print("Exit reached! Reloading level...");
+        CallDeferred(nameof(ReloadScene));
+    }
 
-        // Safe reload - GetTree() is valid here because this node
-        // is still active in the tree when the signal fires
+    private void ReloadScene()
+    {
+        if (!IsInsideTree()) return;
+
         var tree = GetTree();
-        if (tree != null)
-        {
-            tree.ReloadCurrentScene();
-        }
+        if (tree?.CurrentScene == null) return;
+
+        tree.ReloadCurrentScene();
     }
 }

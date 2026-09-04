@@ -40,6 +40,8 @@ public partial class Enemy : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        if (IsQueuedForDeletion()) return;
+
         MoveAndSlide();
         HandlePlayerCollision();
         HandleEnemyCollision();
@@ -94,6 +96,9 @@ public partial class Enemy : CharacterBody2D
             var collision = GetSlideCollision(i);
             if (collision.GetCollider() is Player player)
             {
+                // Let the player's collision pass resolve descending contacts as stomps.
+                if (player.IsDescendingOnto(this)) return;
+
                 player.TakeDamage(Damage, GlobalPosition);
                 return;
             }

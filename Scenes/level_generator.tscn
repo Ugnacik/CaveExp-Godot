@@ -64,5 +64,3 @@ shape = SubResource("RectangleShape2D_bfltv")
 [node name="PauseMenu" parent="." unique_id=641316087 instance=ExtResource("7_kp8js")]
 process_mode = 3
 visible = false
-
-[connection signal="body_entered" from="ExitSprite/Area2D" to="." method="_on_exit_body_entered"]
