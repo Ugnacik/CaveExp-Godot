@@ -69,7 +69,10 @@ public static class TilePlacer
                         break;
 
                     case 2: // SPIKE
-                        PlaceSpike(pos, spikeLayer);
+                        // A spike is only valid when the room still has solid ground beneath it.
+                        // This also guards direct callers that bypass LevelGenerator's validation.
+                        if (y + 1 < layout.Length && layout[y + 1][x] == Constants.DIRT)
+                            PlaceSpike(pos, spikeLayer);
                         break;
                 }
             }

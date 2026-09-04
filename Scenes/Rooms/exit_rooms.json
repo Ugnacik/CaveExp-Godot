@@ -15,7 +15,7 @@
     ]
   },
   {
-    "name": "room_exit_right",
+    "name": "room_exit_top_right",
     "connections": ["top", "right"],
     "markerPos": [6, 4],
     "layout": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "name": "room_exit_left",
+    "name": "room_exit_top_left",
     "connections": ["top", "left"],
     "markerPos": [6, 4],
     "layout": [
@@ -45,7 +45,7 @@
     ]
   },
   {
-    "name": "room_exit_horizontal",
+    "name": "room_exit_top_horizontal",
     "connections": ["top", "left", "right"],
     "markerPos": [6, 4],
     "layout": [

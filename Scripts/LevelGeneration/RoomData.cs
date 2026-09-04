@@ -23,7 +23,7 @@ public class RoomData
     public int[][] layout { get; set; }
 
     [JsonPropertyName("markerPos")]
-    public int[]? markerPos { get; set; }
+    public int[] markerPos { get; set; }
 
     // Parsed enum version (not serialized)
     [JsonIgnore]
